@@ -1,0 +1,96 @@
+{% extends "base.html" %}
+{% block styles %}
+ <link rel="stylesheet" href="{{url_for('static',filename='font-awesome-4.7.0/css/font-awesome.css')}}" />
+ <link rel="stylesheet" href="{{url_for('static',filename='datetimepicker/css/tempusdominus-bootstrap-4.css')}}">
+
+
+{% endblock styles %}
+{% block app_content %}
+ 
+<form class='' method="post">
+    <fieldset>
+    <legend>Task Schedule</legend>
+      {{form.hidden_tag()}}
+
+      <div class="form-group">
+        {{form.name.label}}
+        {{form.name()}}
+        <small id="subjectHelp" class="form-text text-muted">We'll never share your email with anyone else.</small>
+      </div>
+
+      <div class="form-group">
+        {{form.grade.label}}
+        {{form.grade()}}
+      </div>
+
+      <div class="form-group">
+            {{form.startDate.label}}
+            <div class="input-group date" id="start_date" data-target-input="nearest">
+                <input id="startDate" name="startDate"  type="text" class="form-control datetimepicker-input" data-target="#start_date"/>
+                <div class="input-group-append" data-target="#start_date" data-toggle="datetimepicker">
+                    <div class="input-group-text"><i class="fa fa-calendar"></i></div>
+                </div>
+            </div>
+      </div>
+      <div class="form-group">
+            {{form.endDate.label}}
+            <div class="input-group date" id="end_date" data-target-input="nearest">
+                <input type="text" id="endDate" name="endDate" class="form-control datetimepicker-input" data-target="#end_date"/>
+                <div class="input-group-append" data-target="#end_date" data-toggle="datetimepicker">
+                    <div class="input-group-text"><i class="fa fa-calendar"></i></div>
+                </div>
+            </div>
+      </div>
+
+      <div class="form-group">
+          {{form.startTime.label}}
+          <div class="input-group date" id="start_time" data-target-input="nearest">
+              <input type="text" id="startTime" name="startTime"  class="form-control datetimepicker-input"  data-target="#start_time"/>
+              <div class="input-group-append"  data-toggle="datetimepicker" data-target="#start_time">
+                  <div class="input-group-text"><i class="fa fa-clock-o"></i></div>
+              </div>
+          </div>
+      </div>
+      <div class="form-group">
+          {{form.endTime.label}}
+          <div class="input-group date" id="end_time" data-target-input="nearest">
+              <input type="text" id="endTime" name="endTime"  class="form-control datetimepicker-input"  data-target="#end_time"/>
+              <div class="input-group-append"  data-toggle="datetimepicker" data-target="#end_time">
+                  <div class="input-group-text"><i class="fa fa-clock-o"></i></div>
+              </div>
+          </div>
+      </div>
+      {{form.submit}}
+    </fieldset>
+</form>
+ 
+ 
+{% endblock  %}
+{% block scripts%}
+  
+ <script  src="{{url_for('static',filename='datetimepicker/js/tempusdominus-bootstrap-4.js')}}"></script>
+
+ <script>
+ $(function(){
+         $('#start_date').datetimepicker({
+             // format: 'L',//只显示日期,'LT'只显示时间
+              format: 'YYYY-MM-DD',
+              locale: 'zh-cn'
+          });
+          $('#end_date').datetimepicker({
+              format: 'YYYY-MM-DD',
+              locale: 'zh-cn'
+          });
+          $('#start_time').datetimepicker({
+                  format: 'LT'
+          });
+          $('#end_time').datetimepicker({
+                  format: 'LT'
+          });
+
+  
+ })
+
+
+  </script>
+{% endblock%}

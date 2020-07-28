@@ -1,0 +1,49 @@
+
+<table class='table' >
+<tr>
+        <td>
+            {% set user_link %}
+                <span class="user_popup">
+                    <a href="{{url_for('main.user', username=post.author.username)}}">
+                        {{ post.author.username }}
+                    </a>
+                </span>
+            {% endset %}
+            <div class="container">
+            <div class="row">
+                <div class="d-flex" style="flex-shrink:0,width:70px">
+                    <a href="{{ url_for('user', username=post.author.username) }}">
+                        <img src="{{ post.author.avatar(70) }}" class="rounded-circle"   width="50px" height="50px" />
+                    </a>
+                </div>
+                <div class="col">
+                    <div class="row d-flex justify-content-between">
+                        <div class="d-flex">            
+                            <div>{{user_link}}</div>
+                        </div>
+                        <div class="d-flex">
+                        <span class="text-muted" style="font-size:10px"><i class="fa fa-clock-o"></i>
+                        <span class="html-moment" data-format="YYYY-MM-DD HH:mm:ss" data-timestamp="{{post.timestamp}}" > </span></span>
+                    
+                        </div>
+                    </div>
+                    <div class="row">
+                        <span id="post{{ post.id }}">{{ post.body }}</span>
+                    </div>
+                    <br>
+                    <div class="row flex-row-reverse">
+                        <a href="#" class="d-inline-block text-muted" style="font-size:10px;width: 50px;"><i class="fa fa-eye"></i> 9点击</a>
+                        <span class="d-inline-block text-muted" style="font-size:10px;width: 50px;"><i class="fa fa-commenting-o"></i> 8评论</span>
+                        <a  href="#" class="d-inline-block text-muted text-decoration-none " style="font-size:10px; width:50px"><i class="fa fa-thumbs-o-up "></i> {{post.thumb_up}}点赞</a>        
+                    
+                    </div>
+                </div>
+            </div>
+            </div>
+
+          
+
+        </td>
+        
+</tr>
+</table>

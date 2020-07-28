@@ -1,0 +1,57 @@
+{% extends "base.html" %}
+
+{% block styles %}
+    <style>
+        .form-signin {
+        width: 100%;
+        max-width: 330px;
+        padding: 15px;
+        margin: 0 auto;
+        }
+
+    </style>
+{% endblock styles%}
+{% block app_content %}
+<div class="container text-center">
+    <div class="row text-center"> 
+        <form action="" method="post" novalidate class="form-signin">
+            {{ form.hidden_tag() }}
+            <h1 class="h3 mb-3 font-weight-normal">会员登录</h1>
+
+            <div class="form-group">
+                {{ form.username.label(class="sr-only") }} 
+                {{ form.username(class="form-control",placeholder="用户名",size=32) }}
+            </div>
+            <div class="form-group">
+                {{ form.password.label(class="sr-only") }}
+                {{ form.password(class="form-control",placeholder="请输入密码",size=32) }}
+            </div>
+            <div class="checkbox text-left">
+            <label>
+                {{ form.remember_me() }} {{ form.remember_me.label }}
+            </label>
+            </div>
+            {{ form.submit(class="btn btn-primary btn-block") }}
+            <div class="row">
+                <div class="text-center w-50"  >
+                    <a class="btn btn-default btn-block" href="{{ url_for('register') }}">忘记密码?</a>
+                </div>
+                <div class="text-center w-50">
+                   <a class="btn btn-default btn-block" href="{{ url_for('register') }}">注册</a>
+               </div>
+            </div>
+           
+
+            {% if form.password.errors[0] or form.username.errors[0] %}
+            <div class="alert alert-danger" role="alert">
+               {{ form.username.errors[0] }}  {{ form.password.errors[0] }} 
+            </div>
+            {% endif %}
+            
+        </form>
+    </div>
+</div>
+   
+
+    
+{% endblock app_content %}
