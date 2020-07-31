@@ -18,27 +18,53 @@
                 </div>
                 <div class="col">
                     <div class="row d-flex justify-content-between">
-                        <div class="d-flex">            
-                            <div>{{user_link}}</div>
-                        </div>
-                        <div class="d-flex">
-                        <span class="text-muted" style="font-size:10px"><i class="fa fa-clock-o"></i>
-                        <span class="html-moment" data-format="YYYY-MM-DD HH:mm:ss" data-timestamp="{{post.timestamp}}" > </span></span>
-                    
-                        </div>
+
+                           <div class="container d">          
+                                <div class='row'>{{user_link}}</div>
+                                <div class="row d-flex justify-content-between">
+                                    <div class="text-muted" style="font-size:11px"><i class="fa fa-clock-o"></i>
+                                        <span class="html-moment" data-format="YYYY-MM-DD HH:mm:ss" data-timestamp="{{post.timestamp}}" > </span>
+                                    </div> 
+
+                                    <div class="d-flex justify-content-end  text-muted">
+                                        <a href="#" class="d-inline-block text-muted" style="font-size:10px;width: 50px;"><i class="fa fa-eye"></i> 9点击</a>
+                                        <span class="d-inline-block text-muted" style="font-size:10px;width: 50px;"><i class="fa fa-commenting-o"></i> 8评论</span>
+                                        {%if post.is_liking(current_user) %}
+                                        <a href="#" class="d-inline-block text-decoration-none likes  liked " style="font-size:10px;" data-postid={{post.id}}>   
+                                            <i class="fa fa-thumbs-up "></i>                         
+                                            <span class='count'> {{post.likes_count()}}<span>
+                                        </a>  
+                                        {%else%}
+                                            <a href="#" class="d-inline-block text-decoration-none likes text-muted " style="font-size:10px;" data-postid={{post.id}}>   
+                                            <i class="fa fa-thumbs-o-up "></i>                         
+                                            <span class='count'> {{post.likes_count()}}<span>
+                                            </a> 
+                                        {%endif%}    
+                                    </div>
+
+                                </div>     
+
+                            </div>
+
                     </div>
+                    
                     <div class="row">
                         <span id="post{{ post.id }}">{{ post.body }}</span>
                     </div>
-                    <br>
-                    <div class="row flex-row-reverse">
-                        <a href="#" class="d-inline-block text-muted" style="font-size:10px;width: 50px;"><i class="fa fa-eye"></i> 9点击</a>
-                        <span class="d-inline-block text-muted" style="font-size:10px;width: 50px;"><i class="fa fa-commenting-o"></i> 8评论</span>
-                        <a  href="#" class="d-inline-block text-muted text-decoration-none " style="font-size:10px; width:50px"><i class="fa fa-thumbs-o-up "></i> {{post.thumb_up}}点赞</a>        
-                    
+
+                     <!-- comments-->
+                    <div class="container mt-2">
+                    {%for comment in post.get_comments():%}
+                        {% include '_comment.html' %}
+                    {%endfor%}
                     </div>
+                     <!-- endcomments-->
+                    <br>
+                   
+                   
                 </div>
             </div>
+            
             </div>
 
           

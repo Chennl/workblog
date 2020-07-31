@@ -10,7 +10,7 @@ import imghdr
 
 from app import app,db
 from app.forms import LoginForm,RegistrationForm,EditProfileForm,EmptyForm,CourseForm
-from app.models import User, Post,Course,Schedule
+from app.models import User, Post,Course,Schedule,Likes
 
 
 
@@ -157,11 +157,9 @@ def upload_avatar():
                     abort(400)
                 file.save(os.path.join(current_app.config['UPLOAD_FOLDER'], filename))
 
-@app.route('/thumbup',methods=['GET','POST'])
-def thumbup():
-    data = request.get_json() or {}
-    print(data)
-    return jsonify({'count':1})
+
+
+
 
 @app.route('/new_task',methods=['GET','POST','PUT'])
 def new_task():

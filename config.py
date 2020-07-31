@@ -22,7 +22,7 @@ class Config(object):
 
 
 
-    POSTS_PER_PAGE = 3
+    POSTS_PER_PAGE = 10
 
 
 

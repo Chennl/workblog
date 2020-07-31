@@ -1,5 +1,5 @@
 from app import app, db
-from app.models import User, Post,Course,Schedule
+from app.models import User, Post,Course,Schedule,Likes
 
 import sched
 import time
@@ -14,4 +14,4 @@ def make_shell_context():
     s =sched.scheduler(time.time,time.sleep)
     print(time.time())
     s.enter(10, 1, job)
-    return {'db': db, 'User': User, 'Post': Post,'Course':Course,'Schedule':Schedule}
+    return {'db': db, 'User': User, 'Post': Post,'Course':Course,'Schedule':Schedule,'Likes':Likes}

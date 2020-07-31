@@ -3,8 +3,11 @@
 
 {% block styles %}
 <style type="text/css">
-    .thumb-up{
-        color:red
+    .liked{
+        color:red!important
+    }
+    .no-liked{
+        color:#6c757d!important
     }
 </style>
 
@@ -27,9 +30,7 @@
 {% if next_url%}<a href="{{next_url}}">下一页</a>{% endif%}
 
 <nav aria-label="...">
- 
   <ul class="pagination">
-   
     <li class="{{'page-item' if pagination.has_prev else 'page-item disabled'}}">
       <a class="page-link" href="{{url_for('main.index',page=pagination.prev_num if pagination.has_prev else None)}}" tabindex="-1" aria-disabled="true">上一页</a>
     </li>
@@ -60,24 +61,32 @@
 <script type="text/javascript" src="{{url_for('static',filename='axios/axios.js')}}"></script>
 <script>
     $(function(){
-        $("button").click(function(){
-            $thumbup = $(this).next();
-            const postid=$(this).data("postid");
-             console.log(postid);
-            axios.post('/thumbup',{postid})
-            .then(function(response){  
-                console.log(response);
-               // $thumbup.text(response['count'])
-               // $("svg").toggleClass("thumb-up");
-            })
-            .catch(function(error){
-                console.log("error");
-                console.log(error);
-            });
-
-        }) ;
-
+ 
         html_moment_render_all();
+
+        $('.likes').each(
+            function(){
+                var postid=$(this).data('postid');
+                //点赞处理
+                $(this).click(function(){
+                    if($(this).hasClass('liked')) {
+                        $(this).removeClass('liked').addClass('text-muted').children('.fa-thumbs-up').removeClass('fa-thumbs-up').addClass('fa-thumbs-o-up');
+                        $(this).children('.count').text(parseInt($(this).children('.count').text()) - 1);
+                    }else{
+                        $(this).addClass('liked').removeClass('text-muted').children('.fa-thumbs-o-up').removeClass('fa-thumbs-o-up').addClass('fa-thumbs-up');
+                        $(this).children('.count').text(parseInt($(this).children('.count').text()) + 1);
+                    }
+
+                    axios.post('/api/likes/'+postid,{'postid':postid})
+                    .then(function(response){  
+                        console.log(response);
+                    })
+                    .catch(function(error){
+                        console.log(error);
+                    });
+                });
+            }
+        );
     });
 </script>
 {% endblock scripts %}

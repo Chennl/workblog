@@ -5,7 +5,8 @@ import base64
 from werkzeug.security import generate_password_hash, check_password_hash
 from flask_login import UserMixin
 from hashlib import md5
-from itsdangerous import TimedJSONWebSignatureSerializer as Serializer 
+from itsdangerous import TimedJSONWebSignatureSerializer as Serializer
+from sqlalchemy import or_,and_
 
 
 from app import db,login_manager
@@ -15,12 +16,9 @@ followers = db.Table(
     db.Column('follower_id',db.Integer,db.ForeignKey('user.id')),
     db.Column('followed_id',db.Integer,db.ForeignKey('user.id'))
 )
+ 
 
-comments = db.Table(
-    'comments',
-    db.Column('post_id',db.Integer,db.ForeignKey('post.id')),
-    db.Column('comment_id',db.Integer,db.ForeignKey('post.id'))
-)
+ 
 
 class User(UserMixin,db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -35,6 +33,8 @@ class User(UserMixin,db.Model):
     posts = db.relationship('Post', backref='author', lazy='dynamic')
     token = db.Column(db.String(32), index=True, unique=True)
     token_expiration = db.Column(db.DateTime)
+    comments = db.relationship('Comments', backref='author', lazy='dynamic')
+    
 
     followed = db.relationship('User',
                 secondary=followers,
@@ -101,22 +101,57 @@ class User(UserMixin,db.Model):
             return None
         return user
 
+
 class Post(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     body = db.Column(db.String(140))
     timestamp = db.Column(db.DateTime, index=True, default=datetime.utcnow)
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
     language = db.Column(db.String(5))    
-    thumb_up = db.Column(db.Integer, default=0)
-    commented = db.relationship('Post',
-            secondary=comments,
-            primaryjoin=(comments.c.post_id==id),
-            secondaryjoin=(comments.c.comment_id==id),
-            backref=db.backref('comments', lazy='dynamic'), lazy='dynamic')
+   
+    
+    def get_comments(self):
+        return  Comments.query.filter(Comments.post_id==self.id)
+ 
+    def likes_count(self):
+        return Likes.query.filter(Likes.post_id==self.id).count()
+
+    def is_liking(self,user):
+        filter = {
+            and_(
+                Likes.post_id==self.id,
+                Likes.user_id==user.id,
+            )}
+        count = Likes.query.filter(*filter).count()
+        return count>0
 
     def __repr__(self):
-        return '<Post {}>'.format(self.body)
+        return '<Post:("id":%s,"body":%s)>'%(self.id,self.body)
 
+class Comments(db.Model):
+    __tablename__ = 'comments'
+    id = db.Column(db.Integer, primary_key=True)
+    body = db.Column(db.String(140))
+    timestamp = db.Column(db.DateTime, index=True, default=datetime.utcnow)
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
+    language = db.Column(db.String(5))
+    thread_sequence = db.Column(db.Integer,default=0)    
+    post_id = db.Column(db.Integer)
+ 
+    def __repr__(self):
+        return '<Comments:("id":%s,"body":%s)>'%(self.id,self.body)
+        
+class Likes(db.Model):
+    __tablename__ = 'likes'
+    id = db.Column(db.Integer, primary_key=True)
+    post_id=db.Column(db.Integer)
+    user_id = db.Column(db.Integer)
+    
+    def to_dict(self):
+        return  {'post_id':self.post_id,'user_id':user_id} 
+
+    def __repr__(self):
+        return '<like: (id=%s,post_id=%s,user_id=%s)'%(self.id,self.post_id,self.user_id)
 
 class Schedule(db.Model):
     id = db.Column(db.INTEGER,autoincrement=True,primary_key=True)
