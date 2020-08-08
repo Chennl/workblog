@@ -1,12 +1,15 @@
 
             <div class="row">
                 <div class="d-flex" style="flex-shrink:0,width:70px">
-                    <a href="{{ url_for('user', username=comment.author.username) }}">{{comment.author.username}}</a>
-                </div>评论:
-                <div class="col">
-                    <div class="row">
-                        <span id="comment{{ comment.id }}">{{ comment.body }}</span>
+                    <a href="{{ url_for('main.user', username=comment.author.username) }}">{{comment.author.username}}</a>
+                </div>
+                <div class="col"><span class="text-muted">评论:</span>
+                    <div >
+                    <span id="comment{{ comment.id }}">{{ comment.body }}</span>
                     </div>
                 </div>
             </div>
+            
+                
+
 

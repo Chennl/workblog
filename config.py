@@ -8,6 +8,7 @@ class Config(object):
 
     #upload files
     UPLOAD_FOLDER='app\\static\\avatars'
+    SONG_FOLDER='app\\static\\media\\song'
     #照片上传设置
     MAX_CONTENT_LENGTH   = 1024 * 1024
     UPLOAD_EXTENSIONS = ['.jpg', '.png', '.gif']
@@ -20,7 +21,8 @@ class Config(object):
     MAIL_PASSWORD = os.environ.get('MAIL_PASSWORD') or 'live1975'
     ADMINS = ['chennl@live.com']
 
-
+    #日志输出
+    LOG_TO_STDOUT = True
 
     POSTS_PER_PAGE = 10
 

@@ -2,11 +2,17 @@ from datetime import datetime
 from flask import render_template, flash, redirect, url_for, request, g, \
     jsonify, current_app
 from flask_login import current_user, login_required
-from app import db,app
-from app.main.forms import EmptyForm,PostForm
+from app import db
+from app.main.forms import EmptyForm,PostForm,EditProfileForm
 from app.models import User, Post
 from app.main import bp
 
+
+@bp.before_request
+def before_request():
+    if current_user.is_authenticated:
+        current_user.last_seen = datetime.now()
+        db.session.commit()
 
 
 @bp.route('/', methods=['GET', 'POST'])
@@ -15,7 +21,7 @@ from app.main import bp
 def index():
     form = PostForm()
     if form.validate_on_submit():
-        post = Post(body=form.post.data,author=current_user,language='')
+        post = Post(body=form.post.data,author=current_user,language='',host_id=form.host.data,category=form.category.data)
         db.session.add(post)
         db.session.commit()
         flash(u'微博发表成功!')
@@ -46,3 +52,54 @@ def user_popup(username):
     user = User.query.filter_by(username=username).first_or_404()
     form = EmptyForm()
     return render_template('user_popup.html', user=user, form=form)
+
+@bp.route('/edit_profile',methods=['GET','POST'])
+@login_required
+def edit_profile():
+    form = EditProfileForm()
+    if form.validate_on_submit():
+        file = request.files['avatar_file']
+        filename = secure_filename(file.filename)
+        file.save(os.path.join(current_app.config['UPLOAD_FOLDER'], filename))
+        current_user.username = form.username.data
+        current_user.about_me = form.about_me.data
+        current_user.avatar_file = filename
+        db.session.commit()
+
+        flash('资料更新成功!')
+        return redirect(url_for('edit_profile'))
+    elif request.method =='GET':
+        form.username.data = current_user.username
+        form.about_me.data = current_user.about_me
+        form.avatar_file.data  = current_user.avatar_file
+        return render_template('edit_profile.html', title='修改个人资料',form=form)
+
+@bp.route('/follow/@<username>')
+@login_required
+def follow(username):
+    user = User.query.filter_by(username=username).first()
+    if user is None:
+        flash('User {} is not found.'.format(username))
+        redirect(url_for('index'))
+    if user == current_user:
+        flash('You can not follow yourself.')
+        return redirect(url_for('user',username=username))
+    current_user.follow(user)
+    db.session.commit()
+    flash('You are following {}.'.format(username))
+    return redirect(url_for('user',username=username))
+
+@bp.route('/unfollow/@<username>')
+@login_required
+def unfollow(username):
+    user = User.query.filter_by(username=username).first()
+    if user is None:
+        flash('User {} not found.', username=username)
+        return redirect(url_for('index'))
+    if user == current_user:
+        flash('You cannot unfollow yourself!')
+        return redirect(url_for('user', username=username))
+    current_user.unfollow(user)
+    db.session.commit()
+    flash('You are not following {}.'.format(username))
+    return redirect(url_for('user', username=username))

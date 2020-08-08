@@ -15,16 +15,32 @@
 
 {% block app_content %}
 <h1>你好, {{ current_user.username }}!</h1>
+
+<br>
 {% if form %}
-    <form method='post' >
-       {{form.hidden_tag() }}
-       {{render_field(form.post,class="form-control",row=3)}}
-       {{form.submit}}
+<form method="post">
+      {{form.hidden_tag() }}  
+        <h5 for="post">我要发微博</h5> 
+        <div class="form-group">
+            <textarea class="form-control" id="post" name="post" placeholder="写一些自己的心情或者自己遇到的一些事情..." required="" row="3"></textarea>
+        </div>
+        <div class="form-group"><input  value='0' name="host" type="text" hidden id="host"></div>
+        <div class="form-group d-flex justify-content-between">
+        <div class="form-group">
+            {%for c in form.category.choices %}
+                <div class="form-check form-check-inline">
+                    <input class="form-check-input" type="radio" name="category" id="category" value="{{c[0]}}">
+                    <label class="form-check-label" for="category">{{c[1]}}</label>
+                </div>
+            {%endfor%}
+            </div>
+        <input class="btn btn-warning" id="submit" name="submit" type="submit" value="发表微博"></div>
     </form>
 {% endif %}
- 
+ <br>
 {% for post in posts %}
     {% include '_post.html' %}
+
 {% endfor %}
 {% if prev_url%}<a href="{{prev_url}}">上一页</a>{% endif%}
 {% if next_url%}<a href="{{next_url}}">下一页</a>{% endif%}
@@ -87,6 +103,40 @@
                 });
             }
         );
+
+        
+        axios.get('http://httpbin.org/ip')
+        .then(function(response){
+             var ip= response.data.origin;
+            
+
+            console.log(response.data);
+            console.log(response.status);
+            console.log(response.statusText);
+            console.log(response.headers);
+            console.log(response.config);
+        }).catch(function(error){
+            if (error.response) {
+                    console.log(error.response.data);
+                    console.log(error.response.status);
+                    console.log(error.response.headers);
+               
+            }
+        });
+
+ var url= 'http://ip.ws.126.net/ipquery?ip=0.176.200.148' 
+             axios.get(url)
+             .then(function(response){
+                 var data = response.data;
+                console.log(response.data);
+             })
+             .catch(function(error){
+                if (error.response) {
+                    console.log(error.response.data);
+                    console.log(error.response.status);
+                    console.log(error.response.headers);  
+                }
+             });
     });
 </script>
 {% endblock scripts %}
