@@ -39,7 +39,7 @@ def download_song():
             flash('音乐下载失败!')
             print(e)
         return redirect(url_for('download_song'))
-    return render_template('download_song.html',form=form,files=filelist)
+    return render_template('download_song.html',form=form,files=filelist,clientip=clientip)
 
 
 @bp.route('/new_task',methods=['GET','POST','PUT'])

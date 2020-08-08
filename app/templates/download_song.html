@@ -26,6 +26,7 @@ a i{
 {% block app_content %}
     <h1>163音乐下载</h1>
     <hr>
+    <span class='text-muted small'>您来自{{clientip}}</span>
     <div class="container ">
         <form method="post">
             {{ form.hidden_tag() }}

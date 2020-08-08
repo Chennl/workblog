@@ -15,7 +15,7 @@
 
 {% block app_content %}
 <h1>你好, {{ current_user.username }}!</h1>
-
+<span class='text-muted small'>您来自{{clientip}}</span>
 <br>
 {% if form %}
 <form method="post">
