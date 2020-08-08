@@ -8,6 +8,8 @@ from app.models import User, Post
 from app.main import bp
 
 
+
+
 @bp.before_request
 def before_request():
     if current_user.is_authenticated:
@@ -19,8 +21,13 @@ def before_request():
 @bp.route('/index', methods=['GET', 'POST'])
 @login_required
 def index():
-    clientip=request.remote_addr
-    print(clientip)
+    location=''
+    clientip=''
+    # clientip=get_client_ip()
+    # print(clientip)
+    # if clientip != u'未知':
+    #     location=get_client_location(clientip)
+
     form = PostForm()
     if form.validate_on_submit():
         post = Post(body=form.post.data,author=current_user,language='',host_id=form.host.data,category=form.category.data)
@@ -36,7 +43,7 @@ def index():
     prev_url =url_for('main.index',page=pagination.prev_num if pagination.has_prev else None)
 
 
-    return render_template('index.html', title=u'首页', form=form,posts=pagination.items,pagination=pagination,clientip=clientip)
+    return render_template('index.html', title=u'首页', form=form,posts=pagination.items,pagination=pagination,clientip=clientip,location=location)
  
 #https://fontawesome.com/icons?d=gallery&q=next&m=free  6
 #https://fontawesome.com/v4.7.0/icons/ 4.7

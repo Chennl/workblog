@@ -14,8 +14,10 @@
 {% endblock styles %}
 
 {% block app_content %}
-<h1>你好, {{ current_user.username }}!</h1>
-<span class='text-muted small'>您来自{{clientip}}</span>
+
+<div class="row justify-content-between align-items-center">
+<h1>你好, {{ current_user.username }}!</h1><span class='text-muted small'><i class="fa fa-location-arrow"></i>您来自:{{location}}[{{clientip}}]</span>
+ </div>
 <br>
 {% if form %}
 <form method="post">
@@ -26,6 +28,7 @@
         </div>
         <div class="form-group"><input  value='0' name="host" type="text" hidden id="host"></div>
         <div class="form-group d-flex justify-content-between">
+
         <div class="form-group">
             {%for c in form.category.choices %}
                 <div class="form-check form-check-inline">
@@ -33,7 +36,13 @@
                     <label class="form-check-label" for="category">{{c[1]}}</label>
                 </div>
             {%endfor%}
+        </div>
+        <div class="form-check"> 
+            <div class="form-check form-check-inline">
+                <input class="form-check-input" type="checkbox" name="located" id="located">
+                <label class="form-check-label" for="located" id="locatedlabel">显示位置</label>
             </div>
+        </div>
         <input class="btn btn-warning" id="submit" name="submit" type="submit" value="发表微博"></div>
     </form>
 {% endif %}
@@ -103,6 +112,25 @@
                 });
             }
         );
+        $('#located').change(function(){
+           // alert($(this).prop('checked'));
+            console.log($(this).prop('checked'));
+            console.log($(this).prop('checked')=="true");
+            
+            if($(this).prop('checked')){
+                 $("#locatedlabel").text("正在定位...");
+                axios.get("/api/get_location")
+                .then(function(res){
+                    $("#locatedlabel").text(res.data.location);
+                })
+                .catch(function(){
+                     $("#locatedlabel").text("定位失败");
+                });
+            }
+            else{
+                $("#locatedlabel").text("显示位置");
+            }
+        });
 
         
         axios.get('http://httpbin.org/ip')

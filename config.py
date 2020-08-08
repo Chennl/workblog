@@ -8,7 +8,7 @@ class Config(object):
 
     #upload files
     UPLOAD_FOLDER='app\\static\\avatars'
-    SONG_FOLDER='app\\static\\media\\song'
+    SONG_FOLDER=os.path.join(basedir,'app\\static\\media\\song')
     #照片上传设置
     MAX_CONTENT_LENGTH   = 1024 * 1024
     UPLOAD_EXTENSIONS = ['.jpg', '.png', '.gif']

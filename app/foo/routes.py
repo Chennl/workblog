@@ -14,6 +14,13 @@ def download_song():
     print(clientip)
     form = SongForm()
     song_base_path=current_app.config['SONG_FOLDER']
+    print(song_base_path)
+    #begin Study 获取当前目录绝对路径
+    dir_path = os.path.dirname(os.path.abspath(__file__))
+    print('当前目录绝对路径:',dir_path)
+    print('当前flask current_app.root_path目录绝对路径:',current_app.root_path)
+    print('当前flask instance_path目录绝对路径:',current_app.instance_path)
+    #end Study
     filelist=[]
     files = os.listdir(song_base_path)
     for file in files:
