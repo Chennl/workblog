@@ -1,15 +1,23 @@
 
 from app.foo import bp
 from flask import request
-import os
+import os,time
 import requests 
 from flask import render_template, flash, redirect,url_for,request,current_app
 from flask_login import login_required
-from app.foo.forms import SongForm
+from app.foo.forms import SongForm,EmailForm
+
+from app.email import send_email_python,send_email
+from app import mail
+
+
+from flask_mail import Mail, Message
 
 
 @bp.route('/song/download', methods=['GET','POST'])
 def download_song():
+
+ 
     clientip=request.remote_addr
     print(clientip)
     form = SongForm()
@@ -48,6 +56,22 @@ def download_song():
         return redirect(url_for('download_song'))
     return render_template('download_song.html',form=form,files=filelist,clientip=clientip)
 
+@bp.route('/email', methods=['GET','POST'])
+def html_email():
+    form = EmailForm()
+    if form.validate_on_submit():
+        subject = form.subject.data
+        recipients = form.recipients.data.split(';')
+        text_body =form.text_body.data
+        html_body ='<h1>HTML body</h1>'
+        #recipients = ['chennlhz@126.com']
+        msg = Message(subject, sender = current_app.config['MAIL_USERNAME'], recipients = recipients)
+        msg.body =  text_body
+        mail.send(msg)
+        #send_email(subject,sender,recipients)
+        flash('邮件发送成功!')
+        return redirect(url_for('foo.html_email'))
+    return render_template('html_email.html',form=form)
 
 @bp.route('/new_task',methods=['GET','POST','PUT'])
 def new_task():

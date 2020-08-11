@@ -4,15 +4,16 @@
     <h1>修改个人资料</h1>
     <hr>
     <div class="container ">
-        <form action="" method="post" enctype="multipart/form-data">
+        <form action="" method="post" class="dropzone" enctype="multipart/form-data">
             {{ form.hidden_tag() }}
             <div class='form-group'>
                 <div style="position: relative;border: 3px solid lightblue;width: 150px;height:150px;margin: 3px auto;border-radius: 50%;">
-                    <img src="{{'/static/avatars/{}'.format(form.avatar_file.data)}}" alt="选择并上传头像" id="avatar_img"
+                    <img src="{{url_for('main.download_avatar',filename=form.avatar_file.data)}}" alt="选择并上传头像" id="avatar_img"
                         style="width: 140px;height: 140px;left:0;top: 0;border-radius: 50%;"/>
                     <input type="file" id="avatar_file" name="avatar_file"
                         accept="image/jpg,image/png,image/gif"
-                        style="width: 100%;height:100%;opacity: 0;position: absolute;left:0;top: 0;"/><p class="text-secondary mt-1">点击更换头像</p>
+                        style="width: 100%;height:100%;opacity: 0;position: absolute;left:0;top: 0;"/>
+                        <p class="text-secondary mt-1">点击更换头像</p>
                 </div>
                 <br/>
                 
@@ -36,6 +37,8 @@
 {% endblock app_content %}
 
 {% block scripts %}
+<script src="{{url_for('static',filename='dropzone-7.5.0/dist/dropzone.js')}}"></script>
+ 
  <script>
    // 头像预览
     $("#avatar_file").change(function () {
@@ -53,5 +56,11 @@
             }
         }
     });
+  /*  $(function(){
+        Dropzone.options.myAwesomeDropzone = {
+            paramName: "avatar_file", // The name that will be used to transfer the file
+            maxFilesize: 2, // MB
+        }
+    })*/
  </script>
 {% endblock%}

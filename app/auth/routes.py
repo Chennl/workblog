@@ -64,11 +64,10 @@ def reset_password_request():
         user = User.query.filter_by(email=form.email.data).first()
         if user:
             send_password_reset_email(user)
-        flash(
-            _('Check your email for the instructions to reset your password'))
+        flash('Check your email for the instructions to reset your password')
         return redirect(url_for('auth.login'))
     return render_template('auth/reset_password_request.html',
-                           title=_('Reset Password'), form=form)
+                           title='重置密码', form=form)
 
 
 @bp.route('/reset_password/<token>', methods=['GET', 'POST'])
@@ -82,6 +81,6 @@ def reset_password(token):
     if form.validate_on_submit():
         user.set_password(form.password.data)
         db.session.commit()
-        flash(_('Your password has been reset.'))
+        flash('Your password has been reset.')
         return redirect(url_for('auth.login'))
     return render_template('auth/reset_password.html', form=form)

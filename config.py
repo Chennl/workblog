@@ -10,16 +10,18 @@ class Config(object):
     UPLOAD_FOLDER='app\\static\\avatars'
     SONG_FOLDER=os.path.join(basedir,'app\\static\\media\\song')
     #照片上传设置
+    AVATAR_UPLOAD_FOLDER=os.path.join(basedir,'app\\static\\avatars')
     MAX_CONTENT_LENGTH   = 1024 * 1024
-    UPLOAD_EXTENSIONS = ['.jpg', '.png', '.gif']
+    AVATAR_FILE_EXTENSIONS = ['.jpg', '.png', '.gif']
 
     # emiail
-    MAIL_SERVER = os.environ.get('MAIL_SERVER') or 'outlook.office365.com'
-    MAIL_PORT = int(os.environ.get('MAIL_PORT') or 993)
+    MAIL_SERVER = os.environ.get('MAIL_SERVER') or 'smtp.126.com'
+    MAIL_PORT = int(os.environ.get('MAIL_PORT') or 25)
     MAIL_USE_TLS = os.environ.get('MAIL_USE_TLS') or 1
-    MAIL_USERNAME = os.environ.get('MAIL_USERNAME') or 'chennl@live.com'
-    MAIL_PASSWORD = os.environ.get('MAIL_PASSWORD') or 'live1975'
-    ADMINS = ['chennl@live.com']
+    MAIL_USERNAME = os.environ.get('MAIL_USERNAME') or 'chennlhz@126.com'
+    MAIL_PASSWORD = os.environ.get('MAIL_PASSWORD') or 'chennl1975a'
+    
+
 
     #日志输出
     LOG_TO_STDOUT = True

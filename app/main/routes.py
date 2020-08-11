@@ -1,12 +1,21 @@
 from datetime import datetime
 from flask import render_template, flash, redirect, url_for, request, g, \
-    jsonify, current_app
+    jsonify, current_app,abort,send_from_directory
 from flask_login import current_user, login_required
 from app import db
 from app.main.forms import EmptyForm,PostForm,EditProfileForm
 from app.models import User, Post
 from app.main import bp
+from werkzeug.utils import secure_filename
+import os,imghdr
 
+def validate_image(stream):
+    header = stream.read(512)
+    stream.seek(0)
+    format = imghdr.what(None,header)
+    if not format:
+        return None
+    return '.'+(format if format !='jpeg' else 'lpg')
 
 
 
@@ -67,23 +76,33 @@ def user_popup(username):
 def edit_profile():
     form = EditProfileForm()
     if form.validate_on_submit():
-        file = request.files['avatar_file']
-        filename = secure_filename(file.filename)
-        file.save(os.path.join(current_app.config['UPLOAD_FOLDER'], filename))
+        upload_file = request.files['avatar_file']
+        filename = secure_filename(upload_file.filename)
+        if filename !='':
+            file_ext = os.path.splitext(filename)[1]
+            if file_ext not in current_app.config['AVATAR_FILE_EXTENSIONS']:
+                abort(400)
+            upload_file.save(os.path.join(current_app.config['AVATAR_UPLOAD_FOLDER'], filename))
+            current_user.avatar_file = filename
+
         current_user.username = form.username.data
         current_user.about_me = form.about_me.data
-        current_user.avatar_file = filename
         db.session.commit()
-
         flash('资料更新成功!')
-        return redirect(url_for('edit_profile'))
+        return redirect(url_for('main.edit_profile'))
     elif request.method =='GET':
         form.username.data = current_user.username
         form.about_me.data = current_user.about_me
         form.avatar_file.data  = current_user.avatar_file
         return render_template('edit_profile.html', title='修改个人资料',form=form)
 
-@bp.route('/follow/@<username>')
+@bp.route('/avatar/<filename>')
+@login_required
+def download_avatar(filename):
+    return send_from_directory(current_app.config['AVATAR_UPLOAD_FOLDER'], filename)
+
+
+@bp.route('/follow/<username>')
 @login_required
 def follow(username):
     user = User.query.filter_by(username=username).first()
@@ -98,7 +117,7 @@ def follow(username):
     flash('You are following {}.'.format(username))
     return redirect(url_for('user',username=username))
 
-@bp.route('/unfollow/@<username>')
+@bp.route('/unfollow/<username>')
 @login_required
 def unfollow(username):
     user = User.query.filter_by(username=username).first()
