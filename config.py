@@ -13,6 +13,10 @@ class Config(object):
     AVATAR_UPLOAD_FOLDER=os.path.join(basedir,'app\\static\\avatars')
     MAX_CONTENT_LENGTH   = 1024 * 1024
     AVATAR_FILE_EXTENSIONS = ['.jpg', '.png', '.gif']
+    #相册
+    MAX_PHOTO_LENGTH   = 1024 * 1024
+    PHOTO_FILE_EXTENSIONS = ['.jpg', '.png', '.gif']
+    PHOTO_UPLOAD_FOLDER = os.path.join(basedir,'app\\album')
 
     # emiail
     MAIL_SERVER = os.environ.get('MAIL_SERVER') or 'smtp.126.com'
@@ -21,6 +25,7 @@ class Config(object):
     MAIL_USERNAME = os.environ.get('MAIL_USERNAME') or 'chennlhz@126.com'
     MAIL_PASSWORD = os.environ.get('MAIL_PASSWORD') or 'chennl1975a'
     
+    ADMINS = ['chennlhz@126.com']
 
 
     #日志输出

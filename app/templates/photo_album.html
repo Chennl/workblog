@@ -1,0 +1,38 @@
+{% extends 'base.html'%}
+ {% block styles %}
+  <link rel="stylesheet" href="{{url_for('static',filename='dropzone-5.7.0/min/dropzone.min.css')}}">
+{% endblock styles %}
+
+{% block scripts%}
+  <script  src="{{url_for('static',filename='dropzone-5.7.0/min/dropzone.min.js')}}"></script>
+  <script>
+      $(function(){
+        Dropzone.options.myAwesomeDropzone = {
+            paramName: "file", // The name that will be used to transfer the file
+            maxFilesize: 2, // MB
+            accept: function(file, done) {
+              if (file.name == "justinbieber.jpg") {
+                done("Naha, you don't.");
+              }
+              else { done(); }
+            }
+          };
+      })
+  </script>
+{% endblock scripts%}
+
+{% block app_content %}
+    <h1>相册上传</h1>
+     <div>using  dropzone.js </div>
+    <form  action="{{ url_for('foo.upload_photo_album') }}"  class="dropzone" id='myAwesomeDropzone'>
+    </form>
+    <div> html 5</div>
+    <form method="POST" action="" enctype="multipart/form-data">
+      <p><input type="file" name="file" accept="image/*"></p>
+      <p><input type="submit" value="Submit"></p>
+    </form>
+     <hr>
+    {% for file in files %}
+      <img src="{{ url_for('foo.get_photo', filename=file) }}" style="width: 64px">
+    {% endfor %}
+{% endblock app_content %}

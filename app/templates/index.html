@@ -47,7 +47,7 @@
     </form>
 {% endif %}
  <br>
-{% for post in posts %}
+{% for post in pagination.items %}
     {% include '_post.html' %}
 
 {% endfor %}
@@ -86,9 +86,7 @@
 <script type="text/javascript" src="{{url_for('static',filename='axios/axios.js')}}"></script>
 <script>
     $(function(){
- 
         html_moment_render_all();
-
         $('.likes').each(
             function(){
                 var postid=$(this).data('postid');

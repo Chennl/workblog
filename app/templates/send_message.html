@@ -1,0 +1,16 @@
+{% extends 'base.html'%}
+{% block app_content %}
+    <h1>{{ '给%s发私信'%recipient }}</h1>
+    <div class="row">
+        <div class="col-md-8">
+               <form method="POST">
+                {{form.hidden_tag() }}  
+                <div class="form-group">
+                <textarea class="form-control" id="message" name="message" placeholder="请输入私信" required="" style="height:124px"></textarea>
+                </div>
+                <input type="submit" class="form-control btn btn-primary" value="发送"></p>
+                </form>
+        </div>
+    </div>
+
+{% endblock app_content %}

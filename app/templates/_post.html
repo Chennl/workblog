@@ -58,18 +58,20 @@
                         {% include '_comment.html' %}
                     {%endfor%}
                     </div>
-                    <div >
-                        <form method="post">
-                            {{form.hidden_tag() }}
-                            <div class="form-group">
-                                <textarea class="form-control" id="post" name="post" row="3" placeholder='说点什么吧'></textarea>
-                            </div><div class="form-group">
-                            <input type="hidden" value='{{post.id}}' name="host" id="host"></div>
-                             <div class="form-group d-flex justify-content-end">
-                                <input id="submit" name="submit" type="submit" class="btn btn-info" value="发表评论">
-                            </div>
-                        </form>
-                    </div>
+                    {%if form%}
+                        <div >
+                            <form method="post">
+                                {{form.hidden_tag() }}
+                                <div class="form-group">
+                                    <textarea class="form-control" id="post" name="post" row="3" placeholder='说点什么吧'></textarea>
+                                </div><div class="form-group">
+                                <input type="hidden" value='{{post.id}}' name="host" id="host"></div>
+                                <div class="form-group d-flex justify-content-end">
+                                    <input id="submit" name="submit" type="submit" class="btn btn-info" value="发表评论">
+                                </div>
+                            </form>
+                        </div>
+                    {%endif%}
 
                      <!-- endcomments-->
                     <br>

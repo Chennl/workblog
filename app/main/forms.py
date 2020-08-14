@@ -19,7 +19,6 @@ class EmptyForm(FlaskForm):
     submit = SubmitField('Submit')
 
 class PostForm(FlaskForm):
-    #category=[{"code":"文摘"},{}]
     post = TextAreaField(u'我要发表新微博',  
         validators = [
             validators.DataRequired(message=u'内容不能为空'),
@@ -29,3 +28,8 @@ class PostForm(FlaskForm):
     host=StringField()
     category = SelectField(u'Programming Language', choices=[(u'文摘', u'文摘'), (u'感想', u'感想'), (u'琐事', u'琐事'), (u'其他', u'其他')])
     submit = SubmitField(u'发表微博', render_kw={'class':'btn btn-warning'})  
+
+class MessageForm(FlaskForm):
+    message = TextAreaField('Message', validators=[
+        validators.DataRequired(), validators.Length(min=0, max=140)])
+    submit = SubmitField('Submit')

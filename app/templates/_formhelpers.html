@@ -11,3 +11,6 @@
     {% endif %}
 </div>
 {% endmacro %}
+{% macro render_moment(timestamp_object) %}
+<span class="html-moment" data-format="YYYY-MM-DD HH:mm:ss" data-timestamp="{{timestamp_object}}" > </span>
+{% endmacro %}

@@ -3,16 +3,23 @@ from app.foo import bp
 from flask import request
 import os,time
 import requests 
-from flask import render_template, flash, redirect,url_for,request,current_app
-from flask_login import login_required
-from app.foo.forms import SongForm,EmailForm
-
+from flask import render_template, flash, redirect,url_for,request,current_app,send_from_directory
+from flask_login import login_required,current_user
+from app.foo.forms import SongForm,EmailForm,CourseForm
 from app.email import send_email_python,send_email
 from app import mail
-
-
+import imghdr
 from flask_mail import Mail, Message
+from werkzeug.utils import secure_filename
 
+def validate_image(stream):
+    header = stream.read(512)
+    stream.seek(0)
+    format = imghdr.what(None, header)
+    #print('imghdr ext:'+format)
+    if not format:
+        return None
+    return '.' + (format if format != 'jpeg' else 'jpg')
 
 @bp.route('/song/download', methods=['GET','POST'])
 def download_song():
@@ -96,3 +103,41 @@ def task_schedule():
     startTime =  datetime.strptime('2020-07-03', "%Y-%m-%d")
     form = CourseForm()
     return render_template('task_schedule.html',title='任务计划',form=form)
+
+@bp.route('/photo_album')
+def photo_album():
+    filepath = os.path.join(current_app.config['PHOTO_UPLOAD_FOLDER'],  current_user.get_id())
+    if not os.path.exists(filepath):
+        os.mkdir(filepath)
+    files = os.listdir(filepath) 
+    return render_template('photo_album.html', files=files)
+
+@bp.route('/photo_album', methods=['POST'])
+def upload_photo_album():
+    filepath = os.path.join(current_app.config['PHOTO_UPLOAD_FOLDER'],  current_user.get_id())
+    if not os.path.exists(filepath):
+        os.mkdir(filepath)
+    uploaded_file = request.files['file']
+    filename = secure_filename(uploaded_file.filename)
+    if filename != '':
+        file_ext = os.path.splitext(filename)[1].lower()
+        if file_ext not in current_app.config['PHOTO_FILE_EXTENSIONS']:# or \
+            #file_ext != validate_image(uploaded_file.stream):
+            print('splitext:'+file_ext)
+            return "Invalid image", 400
+        uploaded_file.save(os.path.join(filepath,filename))
+    return '', 204
+    #         return redirect(url_for('foo.photo_album'))
+    # files = os.listdir(filepath) 
+    # return render_template('photo_album.html', files=files)
+
+
+@bp.route('/album/<filename>')
+def get_photo(filename):
+    filepath = os.path.join(current_app.config['PHOTO_UPLOAD_FOLDER'],  current_user.get_id())
+    print(filepath)
+    return send_from_directory(filepath, filename)
+
+@bp.errorhandler(413)
+def too_large(e):
+    return "File is too large", 413
