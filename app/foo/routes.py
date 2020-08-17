@@ -11,6 +11,7 @@ from app import mail
 import imghdr
 from flask_mail import Mail, Message
 from werkzeug.utils import secure_filename
+ 
 
 def validate_image(stream):
     header = stream.read(512)
@@ -141,3 +142,8 @@ def get_photo(filename):
 @bp.errorhandler(413)
 def too_large(e):
     return "File is too large", 413
+
+
+
+
+

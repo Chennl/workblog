@@ -18,7 +18,7 @@ class LoginForm(FlaskForm):
         validators.length(min=6, message='密码必须大于%(min)d位')
         ],
         widget=widgets.PasswordInput())
-    remember_me = BooleanField(label=u'记住密码')
+    remember_me = BooleanField(label=u'记住我')
     submit = SubmitField('登录')
 
 

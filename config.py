@@ -34,4 +34,5 @@ class Config(object):
     POSTS_PER_PAGE = 10
 
 
-
+    #SESSION_COOKIE_SECURE = True
+    #REMEMBER_COOKIE_SECURE = True

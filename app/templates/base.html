@@ -38,7 +38,7 @@
                       <a class="nav-link" href="{{ url_for('main.index') }}">微博<span class="sr-only">(current)</span></a>
                     </li>
                     <li class="nav-item">
-                      <a class="nav-link" href="{{url_for('foo.task_schedule')}}">Schedule</a>
+                      <a class="nav-link" href="{{url_for('foo.task_schedule')}}">待办</a>
                     </li>
                     <li class="nav-item">
                       <a class="nav-link" href="{{url_for('foo.download_song')}}">音乐</a>
@@ -55,7 +55,7 @@
                   </ul>
                   <ul class="navbar-nav " >
                     {% if current_user.is_anonymous %}
-                    <li class="nav-item"><a class="nav-link" href="{{ url_for('auth.login') }}">Login</a></li>
+                    <li class="nav-item"><a class="nav-link" href="{{ url_for('auth.login') }}">登录</a></li>
                     {% else %}
                     <li class="nav-item">
                     <a class="nav-link" href="{{ url_for('main.messages') }}">私信
@@ -120,7 +120,7 @@
                 {% if current_user.is_authenticated %}
                   $(function() {
                       var since = 0;
-                      setInterval(function() {
+                    /*  setInterval(function() {
                           $.ajax('{{ url_for('main.notifications') }}?since=' + since).done(
                               function(notifications) {
                                   for (var i = 0; i < notifications.length; i++) {
@@ -130,7 +130,7 @@
                                   }
                               }
                           );
-                      }, 10000);
+                      }, 10000);*/
                   });
                 {% endif %}
             </script>
