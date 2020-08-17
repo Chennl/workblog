@@ -8,6 +8,7 @@ from app.models import User, Post,Message,Notification
 from app.main import bp
 from werkzeug.utils import secure_filename
 import os,imghdr
+from app.api.lbs import get_client_ip
 
 def validate_image(stream):
     header = stream.read(512)
@@ -32,7 +33,7 @@ def before_request():
 def index():
     location=''
     clientip=''
-    # clientip=get_client_ip()
+    clientip=get_client_ip()
     # print(clientip)
     # if clientip != u'未知':
     #     location=get_client_location(clientip)
