@@ -11,6 +11,7 @@ class LoginForm(FlaskForm):
         validators.DataRequired(message='用户名不能为空'),
         validators.length(min=4, max=16, message='用户名长度必须大于%(min)d且小于%(max)d')]
         )
+
     password = PasswordField(
         label=u'Password',
         validators=[
@@ -29,7 +30,12 @@ class RegistrationForm(FlaskForm):
         validators.DataRequired(message='用户名不能为空'),
         validators.length(min=4, max=16, message='用户名长度必须大于%(min)d且小于%(max)d')]
     )
-
+    nickname = StringField(
+        label =u'昵称',
+        validators = [
+        validators.DataRequired(message='昵称不能为空'),
+        validators.length(min=4, max=32, message='昵称长度必须大于%(min)d且小于%(max)d')]
+        )
     email = StringField(label='电子邮箱', 
         validators=[
             validators.DataRequired(message='邮箱不能为空.'),

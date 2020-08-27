@@ -96,12 +96,14 @@ def edit_profile():
             current_user.avatar_file = filename
 
         current_user.username = form.username.data
+        current_user.nickname = form.nickname.data
         current_user.about_me = form.about_me.data
         db.session.commit()
         flash('资料更新成功!')
         return redirect(url_for('main.edit_profile'))
     elif request.method =='GET':
         form.username.data = current_user.username
+        form.nickname.data = current_user.nickname
         form.about_me.data = current_user.about_me
         form.avatar_file.data  = current_user.avatar_file
         return render_template('edit_profile.html', title='修改个人资料',form=form)

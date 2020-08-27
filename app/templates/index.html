@@ -15,36 +15,40 @@
 
 {% block app_content %}
 
-<div class="row justify-content-between align-items-center">
-<h1>你好, {{ current_user.username }}!</h1><span class='text-muted small'><i class="fa fa-location-arrow"></i>您来自:[{{clientip}}]</span>
- </div>
-<br>
-{% if form %}
-<form method="post">
-      {{form.hidden_tag() }}  
-        <h5 for="post">我要发微博</h5> 
-        <div class="form-group">
-            <textarea class="form-control" id="post" name="post" placeholder="写一些自己的心情或者自己遇到的一些事情..." required="" row="3"></textarea>
-        </div>
-        <div class="form-group"><input  value='0' name="host" type="text" hidden id="host"></div>
-        <div class="form-group d-flex justify-content-between">
-
-        <div class="form-group">
-            {%for c in form.category.choices %}
-                <div class="form-check form-check-inline">
-                    <input class="form-check-input" type="radio" name="category" id="category" value="{{c[0]}}">
-                    <label class="form-check-label" for="category">{{c[1]}}</label>
-                </div>
-            {%endfor%}
-        </div>
-        <div class="form-check"> 
-            <div class="form-check form-check-inline">
-                <input class="form-check-input" type="checkbox" name="located" id="located">
-                <label class="form-check-label" for="located" id="locatedlabel">显示位置</label>
+<div class="row justify-content-between">
+    <h4>你好, {{ current_user.nickname }}!</h4><span class='text-muted small'><i class="fa fa-location-arrow"></i>您来自:[{{clientip}}]</span>
+</div>
+<div class="container">
+    <div class="row">
+    {% if form %}
+        <form method="post" style="width:100%">
+            <div class="form-group">
+                <Label for="post">我要发微博</Label> 
+                {%for c in form.category.choices %}
+                    <div class="form-check form-check-inline">
+                        <input class="form-check-input" type="radio" name="category" id="category" value="{{c[0]}}">
+                        <label class="form-check-label" for="category">{{c[1]}}</label>
+                    </div>
+                {%endfor%}
             </div>
-        </div>
-        <input class="btn btn-warning" id="submit" name="submit" type="submit" value="发表微博"></div>
-    </form>
+            <div class="form-group">
+                    {{form.hidden_tag() }}  
+                <textarea class="form-control" id="post" name="post" placeholder="写一些自己的心情或者自己遇到的一些事情..." required="" row="3"></textarea>
+            </div>
+            
+            <div class="form-group"><input  value='0' name="host" type="text" hidden id="host"></div>
+            
+
+            <div class="form-group d-flex justify-content-between">
+                    <div class="form-check form-check-inline">
+                        <input class="form-check-input" type="checkbox" name="located" id="located">
+                        <label class="form-check-label" for="located" id="locatedlabel">显示位置</label>
+                    </div>
+                <input class="btn btn-success btn-sm" id="submit" name="submit" type="submit" value="发表微博">
+            </div>
+        </form>
+    </div>
+</div>
 {% endif %}
  <br>
 {% for post in pagination.items %}

@@ -10,6 +10,12 @@ class EditProfileForm(FlaskForm):
         validators.DataRequired(message='用户名不能为空'),
         validators.length(min=4, max=16, message='用户名长度必须大于%(min)d且小于%(max)d')]
         )
+    nickname = StringField(
+        label =u'昵称',
+        validators = [
+        validators.DataRequired(message='昵称不能为空'),
+        validators.length(min=4, max=32, message='昵称长度必须大于%(min)d且小于%(max)d')]
+        )
     avatar_file = fields.FileField(u'Avatar')
     about_me = fields.TextAreaField('关于我', validators=[validators.Length(min=0, max=140,message='自我介绍不能超过%(max)d')])
     submit = SubmitField('提交')

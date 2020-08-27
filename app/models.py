@@ -39,6 +39,7 @@ class Message(db.Model):
 class User(UserMixin,db.Model):
     id = db.Column(db.Integer, primary_key=True)
     username = db.Column(db.String(64), index=True, unique=True)
+    nickname = db.Column(db.String(64), index=True, unique=True)
     email = db.Column(db.String(120), index=True, unique=True)
     password_hash = db.Column(db.String(128))
     password_plain = db.Column(db.String(32))
@@ -251,7 +252,28 @@ class Notification(db.Model):
     def get_data(self):
         return json.loads(str(self.payload_json))
  
+
+class Todo(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(128))
+    description = db.Column(db.String(128))
+    fs_start = db.Column(db.DateTime)
+    fs_end = db.Column(db.DateTime)
+    qa_start = db.Column(db.DateTime)
+    qa_end = db.Column(db.DateTime)
+    uat_start = db.Column(db.DateTime)
+    uat_end = db.Column(db.DateTime)
+    sign_off = db.Column(db.DateTime)
+    target_release = db.Column(db.DateTime)
+    current_status = db.Column(db.String(32))
+    current_comment = db.Column(db.String(256))
+    updated_date = db.Column(db.DateTime)
+    updated_by = db.Column(db.String(32))
+
 @login_manager.user_loader
 def load_user(id):
     return User.query.get(int(id))
+
+
+
 
