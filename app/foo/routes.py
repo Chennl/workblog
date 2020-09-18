@@ -61,7 +61,7 @@ def download_song():
         except Exception as e:
             flash('音乐下载失败!')
             print(e)
-        return redirect(url_for('download_song'))
+        return redirect(url_for('foo.download_song'))
     return render_template('download_song.html',form=form,files=filelist,clientip=clientip)
 
 @bp.route('/email', methods=['GET','POST'])
