@@ -27,7 +27,10 @@ def before_request():
         db.session.commit()
 
 
-@bp.route('/', methods=['GET', 'POST'])
+@bp.route('/', methods=['GET'])
+def jumpmain():
+    return render_template('nginx.html')
+
 @bp.route('/index', methods=['GET', 'POST'])
 @login_required
 def index():

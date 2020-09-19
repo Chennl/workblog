@@ -1,0 +1,16 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+    </head>
+    <body>
+    {% if yourname%}
+         <p> Hello, your name is {{yourname}}
+    {%else%}
+        <p> Hello, may I have your name?
+        {%endif%}
+
+         <a href="{{url_for('wx.next')}}">下一页</a>
+    </body>
+</html>

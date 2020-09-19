@@ -44,6 +44,11 @@ def create_app(config_class=Config):
     from app.main import bp as main_bp
     app.register_blueprint(main_bp)
 
+    #微信公众号接入蓝图
+    from app.wx import bp as wx_bp
+    app.register_blueprint(wx_bp,url_prefix='/wx')
+
+
     if app.config['LOG_TO_STDOUT'] or False:
         stream_handler = logging.StreamHandler()
         stream_handler.setLevel(logging.INFO)
