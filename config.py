@@ -29,7 +29,7 @@ class Config(object):
 
 
     #日志输出
-    LOG_TO_STDOUT = True
+    LOG_TO_STDOUT = False
 
     POSTS_PER_PAGE = 10
 
