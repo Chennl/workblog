@@ -9,6 +9,7 @@ import requests
  
 
 APPID='wxfa9191e55c89875b'
+#APPID='wxe5c0f537d7c604c6'
 APPSECRET='7df989af9e549cfbad94dc08bbf84534'
 REDIRECT_URL='www.zjswdl.cn'
 STATE='7df989af9e549cf'
@@ -97,8 +98,7 @@ def get_access_token():
         r = requests.get(url)
         data = r.json()
         create_time =time.strftime("%Y-%m-%d %H:%M:%S", time.localtime()) 
-        #data= {'access_token': '37_WyyyfKd1CLz6wWrbpIbtAd_7ls05WtcuMGpq-pAfwNN5yUUxaBa65gfLuBTcfTghEJNBppsFDOrCsLNG0P6Mdc4O7Xt2DqyAIVc19QiOrmPfVptEJMDK_V39X-pAX87zO-2q5TYUMDNlyzPiVUMbAAAZYQ', 'expires_in': 7200}
-        data['expires_by'] = int(time.time()) + data['expires_in']
+        data['expires_by'] = int(time.time()) + 7000
         data['create_time'] = create_time
         access_token = data['access_token']
         print("Access Token:",access_token)
@@ -112,13 +112,14 @@ def get_jsapi_ticket():
     jsapi_ticket = get_jsapi_ticket_from_file()
     if jsapi_ticket == '':
         access_token = get_access_token()
-        url='https://api.weixin.qq.com/cgi-bin/ticket/getticket?access_token={}&type=jsapi'.format(access_token)
+        url='https://api.weixin.qq.com/cgi-bin/ticket/getticket?type=jsapi&access_token={}'.format(access_token)
+
         r = requests.get(url)
         ticket_info =r.json()
         print('ticket json:',ticket_info)
         if ticket_info['errcode']== 0:
-            ticket_info['expires_by'] = int(time.time()) + ticket_info['expires_in']
-            ticket_info['create_time'] = create_time
+            ticket_info['expires_by'] = int(time.time()) + 7000
+            ticket_info['create_time'] =  time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())
             jsapi_ticket = ticket_info['ticket']
             jsapi_ticket_file = os.path.join(get_data_file_path(),'jsapi_ticket.json')
             with open(jsapi_ticket_file,'w+',encoding='utf-8') as fp:
@@ -128,6 +129,8 @@ def get_jsapi_ticket():
 
 def get_jsapi_sign(redirect_url=REDIRECT_URL):
     jsapi_ticket = get_jsapi_ticket()
+    #redirect_url='http://www.zjswdl.cn'+request.full_path
+    print(redirect_url)
     if jsapi_ticket !='':
         jsapi_sign = sign.Sign(jsapi_ticket, redirect_url)
         return jsapi_sign.sign()
@@ -215,8 +218,9 @@ def update_menu():
      create_menu(access_token)
 
 if __name__=='__main__':
+    pass
     #print(get_menu_from_file())
-    update_menu()
+    #update_menu()
     #jsapi_sign = get_jsapi_sign()
 
     #print(jsapi_sign)

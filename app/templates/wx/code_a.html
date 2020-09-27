@@ -9,9 +9,9 @@
     <body>
     <p> code_a page
 
-    <button class="btn btn_primary" id="makeurl">跳转获取Code</button>
+    <button class="btn btn_primary" id="makeurl">产生Url</button>
     <button class="btn btn_primary" id="jump">跳转获取Code</button>
-    <input id="url"/>
+    <input id="url">
     <script>
 
         $(function () {
@@ -19,7 +19,7 @@
                // alert("click");
                 var jumpUrl = 'https://open.weixin.qq.com/connect/oauth2/authorize?';
                 var params ={
-                        appid: 'wxfa9191e55c89875b', // 公众号appid
+                        appid: 'wxe5c0f537d7c604c6', // 公众号appid
                         redirect_uri: 'http://www.zjswdl.cn/wx/code_b', //回调地址，域名配置同一地址 定位到目录
                         response_type: 'code',
                         scope: 'snsapi_userinfo',// 需要用户确认登录
@@ -40,7 +40,7 @@
                         state: 'STATE'
                 };
                 jumpUrl += $.param(params) + '#wechat_redirect';
-                $("url").val(jumpUrl)
+                $("#url").val(jumpUrl)
                
             });
             

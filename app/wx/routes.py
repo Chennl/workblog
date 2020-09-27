@@ -32,7 +32,8 @@ def checkSignature():
 @bp.route('/index',methods=['GET'])
 @bp.route('/index/<yourname>')
 def index(yourname=''):
-    jsapi_sign = WxAPIs.get_jsapi_sign()
+    redirect_url='http://www.zjswdl.cn'+request.full_path
+    jsapi_sign = WxAPIs.get_jsapi_sign(redirect_url)
     return render_template('wx/index.html',yourname=yourname,jsapi_sign=jsapi_sign)
 
 
@@ -74,6 +75,8 @@ def jssdk_index():
          
 @bp.route('/code_a',methods=['GET'])
 def get_code_a():
+   
+    print(redirect_url)
     return render_template('wx/code_a.html')
 
 @bp.route('/code_b',methods=['GET'])
