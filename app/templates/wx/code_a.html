@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+        <script src="http://res.wx.qq.com/open/js/jweixin-1.6.0.js"></script>
+        <script  src="{{url_for('static',filename='jquery-3.5.1/jquery.min.js')}}"></script>
+    </head>
+    <body>
+    <p> code_a page
+
+    <button class="btn btn_primary" id="makeurl">跳转获取Code</button>
+    <button class="btn btn_primary" id="jump">跳转获取Code</button>
+    <input id="url"/>
+    <script>
+
+        $(function () {
+             $("#jump").click(function(){
+               // alert("click");
+                var jumpUrl = 'https://open.weixin.qq.com/connect/oauth2/authorize?';
+                var params ={
+                        appid: 'wxfa9191e55c89875b', // 公众号appid
+                        redirect_uri: 'http://www.zjswdl.cn/wx/code_b', //回调地址，域名配置同一地址 定位到目录
+                        response_type: 'code',
+                        scope: 'snsapi_userinfo',// 需要用户确认登录
+                        state: 'STATE'
+                };
+                jumpUrl += $.param(params) + '#wechat_redirect';
+                location.href = jumpUrl; // 获取code跳转到回调地址
+            });
+
+         　  $("#makeurl").click(function(){
+               // alert("click");
+                var jumpUrl = 'https://open.weixin.qq.com/connect/oauth2/authorize?';
+                var params ={
+                        appid: 'wxfa9191e55c89875b', // 公众号appid
+                        redirect_uri: 'http://www.zjswdl.cn/wx/code_b', //回调地址，域名配置同一地址 定位到目录
+                        response_type: 'code',
+                        scope: 'snsapi_userinfo',// 需要用户确认登录
+                        state: 'STATE'
+                };
+                jumpUrl += $.param(params) + '#wechat_redirect';
+                $("url").val(jumpUrl)
+               
+            });
+            
+
+        });
+            
+    </script>
+
+    </body>
+</html>

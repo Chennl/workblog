@@ -270,6 +270,19 @@ class Todo(db.Model):
     updated_date = db.Column(db.DateTime)
     updated_by = db.Column(db.String(32))
 
+
+# class WxAccessToken(db.Model):
+#     access_token =  db.Column(db.String(512),primary_key=True)
+#     open_id = db.Column(db.String(64))
+#     expires_in = db.Column(db.INTEGER)
+#     refresh_token = db.Column(db.DateTime)
+#     scope = db.Column(db.String(32))
+#     updated_date = db.Column(db.DateTime)
+
+#     def __repr__(self):
+#         return access_token
+    
+
 @login_manager.user_loader
 def load_user(id):
     return User.query.get(int(id))

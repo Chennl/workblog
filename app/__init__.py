@@ -48,22 +48,21 @@ def create_app(config_class=Config):
     from app.wx import bp as wx_bp
     app.register_blueprint(wx_bp,url_prefix='/wx')
 
- 
-    if app.config['LOG_TO_STDOUT'] :
-        print(1)
-        stream_handler = logging.StreamHandler()
-        stream_handler.setLevel(logging.INFO)
-        app.logger.addHandler(stream_handler)
-    else:
-        print(2)
-        long_path = os.path.join(os.path.dirname(__file__),'logs')
-        print('You will find log file under path:',long_path)
-        if not os.path.exists(long_path):
-            os.mkdir(long_path)
-        file_handler = RotatingFileHandler(long_path+'/workblog.log', maxBytes=10240,backupCount=10)
-        file_handler.setFormatter(logging.Formatter('%(asctime)s %(levelname)s: %(message)s [in %(pathname)s:%(lineno)d]'))
-        file_handler.setLevel(logging.INFO)
-        app.logger.addHandler(file_handler)
+    log_path = os.path.join(os.path.dirname(__file__),'logs')
+    logname = os.path.join(log_path ,'out.log') #指定输出的日志文件名
+
+    if not os.path.exists(log_path):
+        os.mkdir(log_path)
+    print('You will find log file under path:',logname)
+    # if app.config['LOG_TO_STDOUT'] :
+    #     stream_handler = logging.StreamHandler()
+    #     stream_handler.setLevel(logging.INFO)
+    #     app.logger.addHandler(stream_handler)
+    # else:
+    file_handler = RotatingFileHandler(logname, maxBytes=10240,backupCount=10)
+    file_handler.setFormatter(logging.Formatter('%(asctime)s %(levelname)s: %(message)s [in %(pathname)s:%(lineno)d]'))
+    file_handler.setLevel(logging.INFO)
+    app.logger.addHandler(file_handler)
 
     # if app.config['MAIL_SERVER']:
     #         auth = None
@@ -82,7 +81,8 @@ def create_app(config_class=Config):
 
 
     app.logger.setLevel(logging.INFO)
-    app.logger.info('Workblog startup')
+    app.logger.info('Workblog startup...')
+    
     return app
 """ if app.config['MAIL_SERVER']:
     auth = None

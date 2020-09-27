@@ -3,27 +3,25 @@
     <head>
         <meta charset="utf-8">
         <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
-       
         <script src="http://res.wx.qq.com/open/js/jweixin-1.6.0.js"></script>
         <script  src="{{url_for('static',filename='jquery-3.5.1/jquery.min.js')}}"></script>
     </head>
     <body>
-
-    
-    
-
-         <a href="{{url_for('wx.next')}}">下一页</a>
-         <script>
-   
-            $(function () {
-
-          
-
-            });
-            </script>
+    <p> code_b.html
+    <button class="btn btn_primary" id="jump">跳转获取Code</button>
+     
+        <p> Code: {{code}}, State: {{state}}
+        <p> Url: {{url}} 
   
+    <script>
+
+        $(function () {
+         
          
 
-         
+        });
+            
+    </script>
+
     </body>
 </html>

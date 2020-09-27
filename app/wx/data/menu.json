@@ -1,4 +1,4 @@
-menu_data = {
+{
     "button": [
         {
             "type": "click", 
@@ -15,8 +15,18 @@ menu_data = {
                 }, 
                 {
                     "type": "view", 
-                    "name": "测试", 
-                    "url": "http://www.zjswdl.cn/wx/"
+                    "name": "测试index", 
+                    "url": "http://www.zjswdl.cn/wx/index"
+                }, 
+                {
+                    "type": "view", 
+                    "name": "code_a", 
+                    "url": "http://www.zjswdl.cn/wx/code_a"
+                }, 
+                {
+                    "type": "view", 
+                    "name": "code_b", 
+                    "url": "http://www.zjswdl.cn/wx/code_b"
                 }, 
                 {
                     "type": "click", 

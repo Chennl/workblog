@@ -2,10 +2,16 @@
 import urllib.request
 import urllib.parse
 import json
-from app.wx import menu_info,WxConstants
+import os
+import time
+from app.wx import WxConstants,sign
+import requests
+ 
 
 APPID='wxfa9191e55c89875b'
 APPSECRET='7df989af9e549cfbad94dc08bbf84534'
+REDIRECT_URL='www.zjswdl.cn'
+STATE='7df989af9e549cf'
 
 def WxGet(url):
         try:
@@ -33,15 +39,113 @@ def WxPost(url,data):
         except Exception as e:
             print(e)
 
+
+def get_access_token_from_file():
+    json_data = {}
+    file_path = os.path.join(os.path.abspath(os.path.dirname(__file__)),'data')
+    if not os.path.exists(file_path):
+        os.mkdir(file_path)
+        return ''
+
+    access_token_file = os.path.join(file_path,'access_token.json')
+    if os.path.isfile(access_token_file):
+        with open(access_token_file,'r') as fp:
+            json_str = fp.read()
+            if(len(json_str)<10):
+                return ''
+            json_data = json.loads(json_str)
+
+        expires_by = json_data['expires_by']
+        if expires_by < int(time.time()):
+            return ''
+        else:
+            return json_data['access_token']
+    else:
+        return ''
+
+def get_data_file_path():
+    file_path = os.path.join(os.path.abspath(os.path.dirname(__file__)),'data')
+    if not os.path.exists(file_path):
+        os.mkdir(file_path)
+    return file_path
+
+def get_jsapi_ticket_from_file():
+    json_data = {}
+    jsapi_ticket_file = os.path.join(get_data_file_path(),'jsapi_ticket.json')
+    if os.path.isfile(jsapi_ticket_file):
+        with open(jsapi_ticket_file,'r',encoding='utf-8') as fp:
+            json_str = fp.read()
+            if(len(json_str)<10):
+                return ''
+            json_data = json.loads(json_str)
+            
+        expires_by = json_data['expires_by']
+        if expires_by < int(time.time()):
+            return ''
+        else:
+            return json_data['ticket']
+    else:
+        return ''
+
+
 def get_access_token():
-    targetUrl='https://api.weixin.qq.com/cgi-bin/token?grant_type=client_credential&appid={}&secret={}'.format(APPID,APPSECRET)
-    return WxGet(targetUrl)
+
+    access_token =get_access_token_from_file()
+    
+    if access_token == '':
+        url='https://api.weixin.qq.com/cgi-bin/token?grant_type=client_credential&appid={}&secret={}'.format(APPID,APPSECRET)
+        r = requests.get(url)
+        data = r.json()
+        create_time =time.strftime("%Y-%m-%d %H:%M:%S", time.localtime()) 
+        #data= {'access_token': '37_WyyyfKd1CLz6wWrbpIbtAd_7ls05WtcuMGpq-pAfwNN5yUUxaBa65gfLuBTcfTghEJNBppsFDOrCsLNG0P6Mdc4O7Xt2DqyAIVc19QiOrmPfVptEJMDK_V39X-pAX87zO-2q5TYUMDNlyzPiVUMbAAAZYQ', 'expires_in': 7200}
+        data['expires_by'] = int(time.time()) + data['expires_in']
+        data['create_time'] = create_time
+        access_token = data['access_token']
+        print("Access Token:",access_token)
+        access_token_file = os.path.join(get_data_file_path(),'access_token.json')
+        with open(access_token_file,'w+',encoding='utf-8') as fp:
+            json.dump(data,fp,ensure_ascii=False)
+    return access_token
+
+
+def get_jsapi_ticket():
+    jsapi_ticket = get_jsapi_ticket_from_file()
+    if jsapi_ticket == '':
+        access_token = get_access_token()
+        url='https://api.weixin.qq.com/cgi-bin/ticket/getticket?access_token={}&type=jsapi'.format(access_token)
+        r = requests.get(url)
+        ticket_info =r.json()
+        print('ticket json:',ticket_info)
+        if ticket_info['errcode']== 0:
+            ticket_info['expires_by'] = int(time.time()) + ticket_info['expires_in']
+            ticket_info['create_time'] = create_time
+            jsapi_ticket = ticket_info['ticket']
+            jsapi_ticket_file = os.path.join(get_data_file_path(),'jsapi_ticket.json')
+            with open(jsapi_ticket_file,'w+',encoding='utf-8') as fp:
+                json.dump(ticket_info,fp,ensure_ascii=False)
+    return jsapi_ticket
+
+
+def get_jsapi_sign(redirect_url=REDIRECT_URL):
+    jsapi_ticket = get_jsapi_ticket()
+    if jsapi_ticket !='':
+        jsapi_sign = sign.Sign(jsapi_ticket, redirect_url)
+        return jsapi_sign.sign()
+    else:
+        return {}
 
 def get_menu(access_token):
     targetUrl='https://api.weixin.qq.com/cgi-bin/menu/get?access_token={}'.format(access_token)
     return WxGet(targetUrl)
 
-def create_menu(access_token,menu_data):
+def get_menu_from_file():
+    file_path= os.path.join(get_data_file_path(),'menu.json')
+    with open(file_path,'r',encoding='utf-8') as fp:
+        return json.load(fp)
+    return {}
+    
+def create_menu(access_token):
+    menu_data = get_menu_from_file()
     targetUrl=' https://api.weixin.qq.com/cgi-bin/menu/create?access_token={}'.format(access_token)
     return WxPost(targetUrl,menu_data)
  
@@ -93,34 +197,57 @@ def get_user(access_token):
 def get_user_info(access_token,open_id):
     targetUrl='https://api.weixin.qq.com/cgi-bin/user/info?access_token={}&openid={}'.format(access_token,open_id)
     return WxGet(targetUrl)
- 
+
+
+def upload_media(access_token,media_type,files):
+    targetUrl='https://api.weixin.qq.com/cgi-bin/media/upload?access_token={}&type={}'.format(access_token,media_type)
+    return requests.post(url=targetUrl,  files=files)
+
+
+def upload_image(access_token):
+    files = {'file':open('C:\\workspace\\pythonWorkspace\\workblog\\app\\wx\\medias\\tea.jpg','rb')}
+    return upload_media(access_token,'image',files)
+    #{'type': 'image', 'media_id': 'lpQgSKQSGMe0P0hX2lQjyJdW7Ix8nW1kh9DmUQ39cTYJu1SDjPbpTPwgbwAqVxKd', 'created_at': 1601004616, 'item': []}
+
+def update_menu():
+     access_token = get_access_token()
+     delete_menu(access_token)
+     create_menu(access_token)
+
 if __name__=='__main__':
-    data={'access_token': '37_UvmV6W_zJ5FBr7Et5nZGVj3I6l--oFCMxpnZaezyc7d9xxoVAaM5Trv1-Jbg1UojmMquA6KMEv9uFSZKXO73C5iuoCIKqpKRvtbfqF7GdeuSqWxd6OUyHmESzIFUfReA0Hq9NQ1t6lLiXbRKWSGdABAPLZ', 'expires_in': 7200}
-    #data = get_access_token()
-    access_token= data['access_token']
-  
-    return_json= get_menu(access_token)
-    if 'errcode' in return_json:
-        errcode = return_json['errcode']
-        errmessage = WxConstants.WxResponseCode[errcode]
-        if errcode == 46003:
-            print('errcode:',errcode ,'errmessage:', errmessage)
-            print('不存在的菜单数据，正在为你创建自定义菜单...')
-            return_json = create_menu(access_token,menu_info.menu_data)
-            errcode = return_json['errcode']
+    #print(get_menu_from_file())
+    update_menu()
+    #jsapi_sign = get_jsapi_sign()
+
+    #print(jsapi_sign)
+
+    #data = get_jsapi_ticket(access_token)
+    #print(data)
+    #get_jsapi_ticket
+    #response = upload_image(access_token)
+    #print(response.json())
+  #Media API
+
+  # Menu API
+    # return_json= get_menu(access_token)
+    # if 'errcode' in return_json:
+    #     errcode = return_json['errcode']
+    #     errmessage = WxConstants.WxResponseCode[errcode]
+    #     if errcode == 46003:
+    #         print('errcode:',errcode ,'errmessage:', errmessage)
+    #         print('不存在的菜单数据，正在为你创建自定义菜单...')
+    #         return_json = create_menu(access_token,menu_info.menu_data)
+    #         errcode = return_json['errcode']
             
-            errmessage = WxConstants.WxResponseCode[errcode]
-            print('errcode:',errcode ,'errmessage:', errmessage)
-        else:
-            print('errcode:',errcode ,'errmessage:', errmessage) 
-    else:   
-        print(return_json)
-        #print('正在删除自定义菜单...')
-        #return_json = delete_menu(access_token)
-        #errcode = return_json['errcode']
-        #errmessage = WxConstants.WxResponseCode[errcode]
-        #print('errcode:',errcode ,'errmessage:', errmessage)
-    #return_json = delete_menu(access_token)
-    #print(return_json)
-    #return_json = create_menu(access_token,menu_info.menu_data)
-    #print(return_json)
+    #         errmessage = WxConstants.WxResponseCode[errcode]
+    #         print('errcode:',errcode ,'errmessage:', errmessage)
+    #     else:
+    #         print('errcode:',errcode ,'errmessage:', errmessage) 
+    # else:   
+    #     print(return_json)
+    #     print('正在删除自定义菜单...')
+    #     return_json = delete_menu(access_token)
+    #     errcode = return_json['errcode']
+    #     errmessage = WxConstants.WxResponseCode[errcode]
+    #     print('errcode:',errcode ,'errmessage:', errmessage)
+  

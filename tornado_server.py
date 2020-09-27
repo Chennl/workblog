@@ -7,7 +7,7 @@ from tornado.httpserver import HTTPServer
 from tornado.ioloop import IOLoop 
 from workblog import app
  
-
+app.logger.info('tornado server startup...')
 container = WSGIContainer(app)
 http_server = HTTPServer(container)
 http_server.listen(8008)

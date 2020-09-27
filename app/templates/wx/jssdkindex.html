@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+        <script src="http://res.wx.qq.com/open/js/jweixin-1.6.0.js"></script>
+        <script  src="{{url_for('static',filename='jquery-3.5.1/jquery.min.js')}}"></script>
+    </head>
+    <body>
+
+    <h3 id="menu-voice">音频接口</h3>
+    <p class="desc">开始录音接口</p>
+    <button class="btn btn_primary" id="startRecord">startRecord</button>
+    <p class="desc">停止录音接口</p>
+    <button class="btn btn_primary" id="stopRecord">stopRecord</button>
+    <p class="desc">播放语音接口</p>
+    <button class="btn btn_primary" id="playVoice">playVoice</button>
+    <p class="desc">暂停播放接口</p>
+    <button class="btn btn_primary" id="pauseVoice">pauseVoice</button>
+    <p class="desc">停止播放接口</p>
+    <button class="btn btn_primary" id="stopVoice">stopVoice</button>
+    <p class="desc">拍照接口</p>
+    <button class="btn btn_primary" id="takePhoto">takePhoto</button>
+    
+    
+
+        
+         <script>
+   
+            $(function () {
+
+            wx.config({
+                debug: true, // 开启调试模式,调用的所有api的返回值会在客户端alert出来，若要查看传入的参数，可以在pc端打开，参数信息会通过log打出，仅在pc端时才会打印。
+                appId: 'wxfa9191e55c89875b', // 必填，公众号的唯一标识
+                timestamp: {{jsapi_sign.timestamp}}, // 必填，生成签名的时间戳
+                nonceStr: '{{jsapi_sign.nonceStr}}', // 必填，生成签名的随机串
+                signature: '{{jsapi_sign.signature}}',// 必填，签名
+                jsApiList: ['checkJsApi','chooseImage','onMenuShareTimeline','onMenuShareAppMessage'] // 必填，需要使用的JS接口列表
+                 
+ 
+            });
+            wx.error(function (res) {
+                alert("接口验证失败，详细信息：\n"+JSON.stringify(res));
+            });
+            wx.ready(function () {
+                alert("wx.ready");
+                console.log("wx.ready");
+                document.getElementById('takePhoto').onclick = function () {
+                wx.chooseImage({
+                    count: 1, // 默认9
+                    sizeType: ['original', 'compressed'], // 可以指定是原图还是压缩图，默认二者都有
+                    sourceType: ['album', 'camera'], // 可以指定来源是相册还是相机，默认二者都有
+                    trigger: function (res) {
+                            alert('用户点击拍照');
+                    },
+                    success: function (res) {
+                        var localIds = res.localIds; // 返回选定照片的本地ID列表，localId可以作为img标签的src属性显示图片
+                    },
+                    cancel: function (res) {
+                            alert('已取消');
+                        },
+                        fail: function (res) {
+                            alert(JSON.stringify(res));
+                        }
+                    });
+
+                    
+                    alert('已注册获取“拍照”状态事件');
+                };
+            });
+
+            });
+            </script>
+  
+         
+
+         
+    </body>
+</html>
