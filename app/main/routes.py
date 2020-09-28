@@ -25,7 +25,10 @@ def before_request():
     if current_user.is_authenticated:
         current_user.last_seen = datetime.now()
         db.session.commit()
-
+        
+@bp.route('/MP_verify_BYFISTG63Qu18us1.txt',methods=['GET'])
+def get_mp_verify():
+    return render_template('wx/MP_verify_BYFISTG63Qu18us1.txt')
 
 @bp.route('/', methods=['GET'])
 def jumpmain():

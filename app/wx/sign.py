@@ -17,7 +17,6 @@ class Sign:
 
     def __create_timestamp(self):
         return int(time.time())
-
     def sign(self):
         string = '&'.join(['%s=%s' % (key.lower(), self.ret[key]) for key in sorted(self.ret)])
         print(string)

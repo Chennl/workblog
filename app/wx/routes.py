@@ -25,16 +25,19 @@ def checkSignature():
     print("handle/GET func: hashcode:{}, signature:{} ".format(hashcode, signature))
 
     return  hashcode == signature
-    
- 
 
 @bp.route('/',methods=['GET'])
 @bp.route('/index',methods=['GET'])
-@bp.route('/index/<yourname>')
-def index(yourname=''):
-    redirect_url='http://www.zjswdl.cn'+request.full_path
-    jsapi_sign = WxAPIs.get_jsapi_sign(redirect_url)
-    return render_template('wx/index.html',yourname=yourname,jsapi_sign=jsapi_sign)
+def index():
+    return render_template('wx/index.html')
+
+@bp.route('/get_sign',methods=['GET'])
+def get_sign(): 
+    redirect_url=request.args.get('url')
+    print(redirect_url)
+    sign =WxAPIs.get_jsapi_sign(redirect_url)
+    print(WxAPIs.get_jsapi_sign(redirect_url))
+    return jsonify({'jsapi_sign':sign})
 
 
 @bp.route('/jssdkindex',methods=['GET'])
@@ -72,11 +75,13 @@ def jssdk_index():
     #     sign = sign.Sign(jsapi_ticket,'http://www.zjswdl.cn')
 
     #     return redirect(url_for('index'),token_info=token_info,user_info=user_info,ticket_info=ticket_info,sign=sign)
-         
+
+@bp.route('/MP_verify_BYFISTG63Qu18us1.txt',methods=['GET'])
+def get_mp_verify():
+    return render_template('wx/MP_verify_BYFISTG63Qu18us1.txt')
+
 @bp.route('/code_a',methods=['GET'])
 def get_code_a():
-   
-    print(redirect_url)
     return render_template('wx/code_a.html')
 
 @bp.route('/code_b',methods=['GET'])
@@ -161,5 +166,5 @@ def Handle(object=''):
         except Exception as e:
              current_app.logger.error(e)
              return 'success'
-         
+        
 #WARNING:tornado.access:405 POST /wx/wxsvr?signature=0038d6efd1c0652643283085f2171f77f0f5c4a7&timestamp=1600851814&nonce=1080361974&openid=oMcHK6h_cRu_mVXlftDqA87KRkbs
