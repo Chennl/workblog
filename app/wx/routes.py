@@ -7,6 +7,9 @@ from app.wx  import receive,reply,WxAPIs
 from flask import request
 import requests
 import urllib.parse
+import json
+from app.models import WechatMessage
+from app import db
 
 def checkSignature():
     signature  = request.args.get('signature','')
@@ -80,6 +83,36 @@ def jssdk_index():
 def get_mp_verify():
     return render_template('wx/MP_verify_BYFISTG63Qu18us1.txt')
 
+@bp.route('/default.html',methods=['GET'])
+def default():
+    #051I5A1006gioK1wFM000eGlLS3I5A1G
+    code = request.args.get('code','no code')
+    state = request.args.get('state','no state')
+    if code =='':
+        return render_template('wx/code_a.html',code=code,state=state)
+    else:
+        print(code)
+        token = WxAPIs.get_access_token_by_code(code)
+        print(token)
+        # if 'errcode' not in token:
+        #     url = 'https://api.weixin.qq.com/sns/userinfo?access_token={}&openid={}&lang=zh_CN'.format(token['access_token'],token['openid'])
+        #     user = requests.get(url).json()
+        #     print(user)
+        #     return json.dumps(user)
+        # else:
+        return json.dumps(token)
+
+@bp.route('/userinfo')
+def userinfo():
+    token = WxAPIs.get_access_token_by_code()
+    print(token)
+    url = 'https://api.weixin.qq.com/sns/userinfo?access_token={}&openid={}&lang=zh_CN'.format(token['access_token'],token['openid'])
+    print(url)
+    user = WxAPIs.WxGet(url)
+    return json.dumps(user)
+
+
+
 @bp.route('/code_a',methods=['GET'])
 def get_code_a():
     return render_template('wx/code_a.html')
@@ -141,8 +174,12 @@ def Handle(object=''):
     elif request.method=='POST':
         try:
             webData =  request.get_data()
+
             #后台打日志
             recMsg = receive.parse_xml(webData)
+            wechat_message = WechatMessage(id=0,from_user=recMsg.FromUserName,message_type=recMsg.MsgType,message_body=str(webData,encoding='utf-8'))
+            db.session.add(wechat_message)
+            db.session.commit()
             #current_app.logger.info("request.get_data is ", webData)
             if isinstance(recMsg, receive.Msg) and recMsg.MsgType == 'text':
                 toUser = recMsg.FromUserName
@@ -156,6 +193,18 @@ def Handle(object=''):
                 mediaId = recMsg.MediaId 
                 replyMsg = reply.ImageMsg(toUser, fromUser, mediaId)
                 return replyMsg.send()
+#            elif recMsg.MsgType =='event':
+# <xml>
+#     <ToUserName><![CDATA[toUser]]></ToUserName>
+#     <FromUserName><![CDATA[fromUser]]></FromUserName>
+#     <CreateTime>123456789</CreateTime>
+#     <MsgType><![CDATA[event]]></MsgType>
+#     <Event><![CDATA[LOCATION]]></Event>
+#     <Latitude>23.137466</Latitude>
+#     <Longitude>113.352425</Longitude>
+#     <Precision>119.385040</Precision>
+# </xml>
+
             else:
                 # toUser = recMsg.FromUserName
                 # fromUser = recMsg.ToUserName

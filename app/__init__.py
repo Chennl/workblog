@@ -48,6 +48,11 @@ def create_app(config_class=Config):
     from app.wx import bp as wx_bp
     app.register_blueprint(wx_bp,url_prefix='/wx')
 
+
+    #微信小程序
+    from app.wxmp import bp as mp_bp
+    app.register_blueprint(mp_bp,url_prefix='/minimall')
+
     log_path = os.path.join(os.path.dirname(__file__),'logs')
     logname = os.path.join(log_path ,'out.log') #指定输出的日志文件名
 

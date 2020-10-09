@@ -63,6 +63,24 @@ def get_access_token_from_file():
             return json_data['access_token']
     else:
         return ''
+def get_access_token_by_code_from_file():
+    json_data = {}
+    file_path = get_data_file_path()
+    access_token_file = os.path.join(file_path,'access_token_by_code.json')
+    if os.path.isfile(access_token_file):
+        with open(access_token_file,'r') as fp:
+            try:
+                json_data = json.load(fp)
+            except ValueError:
+                json_data={"errcode":40014,"errmsg":"JSON syntax error"}
+        
+        if json_data['expires_by'] < int(time.time()):
+            json_data={"errcode":40014,"errmsg":"access token time out"}
+        else:
+            return json_data
+    else:
+        json_data={"errcode":40014,"errmsg":"no access token found"}
+    return json_data
 
 def get_data_file_path():
     file_path = os.path.join(os.path.abspath(os.path.dirname(__file__)),'data')
@@ -107,6 +125,22 @@ def get_access_token():
             json.dump(data,fp,ensure_ascii=False)
     return access_token
 
+def get_access_token_by_code(code=''):
+
+    if code == '':
+        data =get_access_token_by_code_from_file()
+
+    else:  
+        url='https://api.weixin.qq.com/sns/oauth2/access_token?appid={}&secret={}&code={}&grant_type=authorization_code'.format(APPID,APPSECRET,code)
+        data = WxGet(url)
+        if 'errcode' not in data:
+            create_time =time.strftime("%Y-%m-%d %H:%M:%S", time.localtime()) 
+            data['expires_by'] = int(time.time()) + 7000
+            data['create_time'] = create_time
+            access_token_file = os.path.join(get_data_file_path(),'access_token_by_code.json')
+            with open(access_token_file,'w+',encoding='utf-8') as fp:
+                json.dump(data,fp,ensure_ascii=False)
+    return data
 
 def get_jsapi_ticket():
     jsapi_ticket = get_jsapi_ticket_from_file()
@@ -199,6 +233,7 @@ def get_user(access_token):
     # }
 def get_user_info(access_token,open_id):
     targetUrl='https://api.weixin.qq.com/cgi-bin/user/info?access_token={}&openid={}'.format(access_token,open_id)
+               #https://api.weixin.qq.com/sns/userinfo?access_token=ACCESS_TOKEN&openid=OPENID&lang=zh_CN
     return WxGet(targetUrl)
 
 
@@ -218,7 +253,9 @@ def update_menu():
      create_menu(access_token)
 
 if __name__=='__main__':
-    pass
+    code='031C1QFa16WUHz0F2uFa1uFbZS1C1QFA'
+    data = get_access_token_by_code(code)
+    print(data)
     #print(get_menu_from_file())
     #update_menu()
     #jsapi_sign = get_jsapi_sign()

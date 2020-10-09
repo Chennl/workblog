@@ -270,7 +270,12 @@ class Todo(db.Model):
     updated_date = db.Column(db.DateTime)
     updated_by = db.Column(db.String(32))
 
-
+class WechatMessage(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    from_user= db.Column(db.String(128))
+    message_type = db.Column(db.String(32))
+    message_body = db.Column(db.String(512))
+    created_date = db.Column(db.DateTime, default=datetime.now)
 # class WxAccessToken(db.Model):
 #     access_token =  db.Column(db.String(512),primary_key=True)
 #     open_id = db.Column(db.String(64))
@@ -282,6 +287,29 @@ class Todo(db.Model):
 #     def __repr__(self):
 #         return access_token
     
+class MallGoods(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    name= db.Column(db.String(128))
+    privilegePrice = db.Column(db.Numeric(10,2))
+    price = db.Column(db.Numeric(10,2))
+    imgUrl = db.Column(db.String(256))
+    details = db.Column(db.String(512))
+    remark= db.Column(db.String(128))
+    createDate = db.Column(db.DateTime, default=datetime.now)
+    updateDate = db.Column(db.DateTime, default=datetime.now)
+    clickRate= db.Column(db.Integer)
+    buyRate= db.Column(db.Integer)
+    stock= db.Column(db.Integer)
+    isHot= db.Column(db.Integer)
+    isNew= db.Column(db.Integer)
+    classifyId= db.Column(db.Integer)
+    discount = db.Column(db.Numeric(10,2))
+    activityId= db.Column(db.Integer)
+    desc= db.Column(db.String(128))
+    shopGoodsImageList= db.Column(db.String(512))
+    def from_dict(self,data):
+        
+
 
 @login_manager.user_loader
 def load_user(id):

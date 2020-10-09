@@ -38,27 +38,27 @@
 
                 <a href="{{url_for('wx.next')}}">下一页</a>
              </div>
+             <div><a href='https://open.weixin.qq.com/connect/oauth2/authorize?appid=wxfa9191e55c89875b&redirect_uri=http://mp.zjswdl.cn/wx/default.html?appid=wxfa9191e55c89875b&v=20190610&response_type=code&scope=snsapi_base&state=9dc800592#wechat_redirect'>测试公众号</a></div>
+             <div><a href='https://open.weixin.qq.com/connect/oauth2/authorize?appid=wxa6dcb6c466cf641f&redirect_uri=http://myscczjqnr.app.swiretest.com/wx/default.html?appid=wxa6dcb6c466cf641f&v=20190610&response_type=code&scope=snsapi_base&state=9dc800592#wechat_redirect'>太古可乐公众号</a></div>
 
         </div>
 
-        //window.location.href = "https://open.weixin.qq.com/connect/oauth2/authorize?appid=APPID&redirect_uri=REDIRECT_URI&response_type=code&scope=SCOPE&state=STATE#wechat_redirect"
-                                  https://open.weixin.qq.com/connect/oauth2/authorize?appid=wx849caac9dc800592&redirect_uri=https%3A%2F%2Fgmp.ficent.com%2Fwechat%2Fdefault.html%3Fappid%3Dwx849caac9dc800592%26v%3D20190610&response_type=code&scope=snsapi_base&state=#wechat_redirect
-         <script>
+          <script>
             window.APPID= 'wxfa9191e55c89875b'
            
         function getCode () { // 非静默授权，第一次有弹框
 
-         var cc=   'https://open.weixin.qq.com/connect/oauth2/authorize?appid=wxfa9191e55c89875b&redirect_uri=http://www.zjswdl.cn/wx/code_a?appid=wxfa9191e55c89875b&v=20190610&response_type=code&scope=snsapi_base&state=#wechat_redirect'
-
-        window.location.href=cc
-        return 
-         var bb=   'https://open.weixin.qq.com/connect/oauth2/authorize?appid=wxa6dcb6c466cf641f&redirect_uri=https://myscczjqnr.app.swiretest.com/default.html?appid=wxa6dcb6c466cf641f&v=20190610&response_type=code&scope=snsapi_base&state=#wechat_redirect'
-         console.log(encodeURIComponent(bb))
-         window.location.href=bb
+        //ZJSW公众号
+          //window.location.href= 'https://open.weixin.qq.com/connect/oauth2/authorize?appid=g&redirect_uri=http://www.zjswdl.cn/wx/default.html?appid=wxfa9191e55c89875b&v=20190610&response_type=code&scope=snsapi_base&state=9dc800592#wechat_redirect'
+        window.location.href=  'https://open.weixin.qq.com/connect/oauth2/authorize?appid=wxa6dcb6c466cf641f&redirect_uri=http://www.zjswdl.cn/wx/default.html?appid=wxa6dcb6c466cf641f&v=20190610&response_type=code&scope=snsapi_base&state=9dc800592#wechat_redirect'
+        
          return 
-        var aa = decodeURIComponent('https://open.weixin.qq.com/connect/oauth2/authorize?appid=wx849caac9dc800592&redirect_uri=https%3A%2F%2Fgmp.ficent.com%2Fwechat%2Fdefault.html%3Fappid%3Dwx849caac9dc800592%26v%3D20190610&response_type=code&scope=snsapi_base&state=#wechat_redirect');
-            console.log(aa)
-            return 
+        //太古可乐公众号
+         //window.location.href=  'https://open.weixin.qq.com/connect/oauth2/authorize?appid=wxa6dcb6c466cf641f&redirect_uri=http://myscczjqnr.app.swiretest.com/wx/default.html?appid=wxa6dcb6c466cf641f&v=20190610&response_type=code&scope=snsapi_base&state=9dc800592#wechat_redirect'
+         return 
+        //飞讯科技 
+         window.location.href ='https://open.weixin.qq.com/connect/oauth2/authorize?appid=wx849caac9dc800592&redirect_uri=https%3A%2F%2Fgmp.ficent.com%2Fwechat%2Fdefault.html%3Fappid%3Dwx849caac9dc800592%26v%3D20190610&response_type=code&scope=snsapi_base&state=#wechat_redirect';
+         return 
             const code = ''//GetUrlParam('code') // 截取路径中的code，如果没有就去微信授权，如果已经获取到了就直接传code给后台获取openId
             const local = window.location.href // encodeURIComponent(local)
             if (code == null || code === '') {
