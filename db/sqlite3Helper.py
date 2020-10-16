@@ -1282,7 +1282,7 @@ print(dbfile)
 
 
 
-from sqlalchemy import Column, DateTime, String, Integer, ForeignKey, func
+from sqlalchemy import exists,Column, DateTime, String, Integer, ForeignKey, func
 from sqlalchemy.orm import relationship, backref
 from sqlalchemy.ext.declarative import declarative_base
  
@@ -1291,27 +1291,6 @@ Base = declarative_base()
 
 
 
-class Department(Base):
-    __tablename__ = 'demo_department'
-    id = Column(Integer, primary_key=True)
-    name = Column(String)
-    create_date = Column(DateTime,default=func.now())
- 
-
-class Employee(Base):
-    __tablename__ = 'demo_employee'
-    id = Column(Integer, primary_key=True)
-    name = Column(String)
-    # Use default=func.now() to set the default hiring time
-    # of an Employee to be the current time when an
-    # Employee record was created
-    hired_on = Column(DateTime, default=func.now())
-    department_id = Column(Integer, ForeignKey('demo_department.id'))
-    department = relationship(
-        Department,
-        backref=backref('employees',
-                         uselist=True,
-                         cascade='delete,all'))
 """ 
 class MallGoods(Base):
     '商品类'
@@ -1347,8 +1326,15 @@ Base.metadata.create_all(engine)
 
 s = session()
 
-init=False
-if init:
+def init_db():
+  Base.metadata.create_all(engine)
+ 
+ 
+def drop_db():
+  #Base.metadata.drop_all(engine)
+  pass
+ 
+def init_data():
     IT = Department(name="IT")
     emp1 = Employee(name="John", department=IT)
     emp2 = Employee(name="Mike", department=IT)
@@ -1381,21 +1367,31 @@ if init:
     s.add(emp4)
     s.add(emp5)
     s.add(emp6)
-    s.add(Financial)
-    s.add(emp11)
-    s.add(emp12)
-    s.add(emp13)
-    s.add(emp14)
-    s.add(emp15)
-    s.add(emp16)
-    s.add(Market)
-    s.add(emp21)
-    s.add(emp22)
-    s.add(emp23)
-    s.add(emp24)
-    s.add(emp25)
-    s.add(emp26)
+    dept_list=[Financial,Market]
+    emp_list=[emp11,emp12,emp13,emp14,emp15,emp16,emp21,emp22,emp23,emp24,emp25,emp26]
+    s.add_all(dept_list)
+    s.add_all(emp_list)
     s.commit() 
+
+# 查询是否存在 结果是布尔值
+it_exists = session.query(
+    exists().where(Employee.id == '3')
+  ).scalar()
+ # 改 更新数据
+  # 数据更新，将值为Mack的serviceDesc修改为Danny
+update_obj = session.query(Employee).filter(Employee.name == 'Mack').update({"remark": "update remark"})
+# 或则
+update_objp = session.query(Employee).filter(Employee.name == 'Mack').first()
+update_objp.remark = 'update remark'
+session.commit()
+
+# 删除
+update_objk = session.query(Employee).filter(Employee.name == 'Mack').delete()
+# 或则
+update_objkp = session.query(Employee).filter(Employee.name == 'Mack').one()
+update_objkp.delete()
+session.commit()
+
 
 results = s.query(Department).filter(Department.name.like('%{0}%'.format('IT'))).all()
 print(type(results))
