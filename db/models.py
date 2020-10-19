@@ -7,14 +7,23 @@ from sqlalchemy import MetaData
 from sqlalchemy.orm import relationship,backref
 from sqlalchemy.ext.declarative import declarative_base
 Base = declarative_base()
-meta = MetaData()
+ 
 class Department(Base):
     __tablename__ = 'demo_department'
     id = Column(Integer, primary_key=True)
     name = Column(String(50))
     create_date = Column(DateTime,default=func.now())
     employees = relationship('Employee',back_populates='department')
- 
+
+class Address(Base):
+    __tablename__ = 'demo_addresses'
+    id = Column(Integer, primary_key=True)
+    email_address = Column(String(100), nullable=False)
+    employee_id = Column(Integer, ForeignKey('demo_employee.id'))
+    employee = relationship('Employee', back_populates="addresses")
+
+    def __repr__(self):
+        return "<Address(email_address='%s')>" % self.email_address
 
 class Employee(Base):
     __tablename__ = 'demo_employee'
@@ -31,7 +40,7 @@ class Employee(Base):
         # backref=backref('employees',
         #                  uselist=True,
         #                  cascade='delete,all'))
-
+    addresses = relationship('Address', order_by=Address.id, back_populates="employee")
 
 category_tree = Table(
     'mall_category_tree', 
@@ -98,3 +107,4 @@ class Goods(Base):
     activityId= Column(Integer)
     desc= Column(String(128))
     shopGoodsImageList= Column(String(512))
+

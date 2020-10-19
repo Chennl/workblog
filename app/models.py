@@ -286,7 +286,7 @@ class WechatMessage(db.Model):
 
 #     def __repr__(self):
 #         return access_token
-    
+
 class MallGoods(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name= db.Column(db.String(128))
@@ -308,7 +308,7 @@ class MallGoods(db.Model):
     desc= db.Column(db.String(128))
     shopGoodsImageList= db.Column(db.String(512))
     def from_dict(self,data):
-        
+        pass
 
 
 @login_manager.user_loader

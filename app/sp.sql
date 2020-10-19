@@ -1,11 +1,10 @@
 USE [OE]
 GO
-/****** Object:  StoredProcedure [SBIPlant].[P_OE_ORM_ProductsAndTicketLimitSplitToStore]    Script Date: 2020/10/15 14:48:06 ******/
+/****** Object:  StoredProcedure [SBIPlant].[P_OE_ORM_ProductsAndTicketLimitSplitToStore]    Script Date: 10/16/2020 9:14:16 PM ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
 GO
-
 -- =============================================
 -- Author:		dongjd 2014-09-26
 -- Update:		dongjd 2015-12-29
@@ -27,11 +26,14 @@ begin
 		business_type_extens varchar(100),
 		town_code varchar(100),
 		del_location_code varchar(100),
-		int_value int
+		int_value int,
+		call_location_code varchar(100),
+		ps_route varchar(100)
 	)
 	
-	insert into #t_downlimit(item_no, trade_name, sub_channel_code, business_type_extens, town_code, del_location_code, int_value)
-	select item_no, ISNULL(trade_name,''), ISNULL(sub_channel_code,''), ISNULL(business_type_extens,''), ISNULL(town_code,''), ISNULL(del_location_code,''), int_value
+	insert into #t_downlimit(item_no, trade_name, sub_channel_code, business_type_extens, town_code, del_location_code, int_value, call_location_code, ps_route)
+	select item_no, ISNULL(trade_name,''), ISNULL(sub_channel_code,''), ISNULL(business_type_extens,''), ISNULL(town_code,''),
+	       ISNULL(del_location_code,''), int_value, ISNULL(call_location_code,''), ISNULL(ps_route,'')
 	from
 	OE.SBIPlant.OE_ProductOrderLimit with(nolock)
 	where function_code = 306--下限条件列表
@@ -82,13 +84,15 @@ begin
 		TownCode nvarchar(10),--乡镇代码
 		TopLimit331 int,--上限现金
 		TopLimit332 int,--上限赊账
-		LowerLimit int--下限
+		LowerLimit int,--下限
+		PsRoute nvarchar(4),--预销线路
+		PaymentTerms nvarchar(4)--付款条件
 	)
 	
-	insert into #tblStore(StoreId,SalesLocCd,ExtBusinessTypeCd,ChainNo,SubTradeChannelCd,DeliveryLocCd,ActDeliveryLocCd,TownCode)
+	insert into #tblStore(StoreId,SalesLocCd,ExtBusinessTypeCd,ChainNo,SubTradeChannelCd,DeliveryLocCd,ActDeliveryLocCd,TownCode,PsRoute)
 	select cust.outlet_no,grop.location_code,grop.business_type_extens,term.trade_name,grop.trade_channel,grop.del_location_code,
 		case ISNULL(grop.act_del_location_code, '') when '' then grop.del_location_code else grop.act_del_location_code end as act_del_location_code, --如果客户有实际发货工厂则取实际发货工厂,否则取出货工厂.此字段目前只供下限使用
-		cust.town_code
+		cust.town_code,grop.ps_route
 	from
 	CM.SBIPlant.CM_Customer cust with(nolock)
 	LEFT JOIN CM.SBIPlant.CM_CustomerGroup grop with(nolock) on cust.outlet_no = grop.outlet_no
@@ -98,9 +102,26 @@ begin
 	CREATE NONCLUSTERED INDEX [IDX_#tblStore_cols1] ON #tblStore(StoreId ASC)
 	CREATE NONCLUSTERED INDEX [IDX_#tblStore_cols2] ON #tblStore(ExtBusinessTypeCd ASC)
 	CREATE NONCLUSTERED INDEX [IDX_#tblStore_cols3] ON #tblStore(StoreId ASC,SalesLocCd ASC,ExtBusinessTypeCd ASC,ChainNo ASC,SubTradeChannelCd ASC,DeliveryLocCd ASC)
-	
-	
-	
+
+	create table #tblStore1
+	(
+		StoreId nvarchar(36),
+		PaymentTerms nvarchar(4)--付款条件
+	)
+
+	insert into #tblStore1(StoreId, PaymentTerms)
+	SELECT t1.outlet_no,t3.payment_terms
+    FROM [CM].[SBIPlant].[CM_CustomerPartnerFunction] t1
+	inner join #tblStore t2
+	on t1.outlet_no = t2.StoreId
+	inner join CM.SBIPlant.CM_CustomerGroup t3
+	on t1.partner_number = t3.outlet_no
+	where partner_type='PY'
+
+	update t1
+	set t1.PaymentTerms = t2.PaymentTerms
+	from #tblStore t1, #tblStore1 t2
+	where t1.StoreId = t2.StoreId
 
 	--全厂可售产品
 	declare @products varchar(max)
@@ -120,7 +141,9 @@ begin
 			@trade_name varchar(max),--KA编号
 			@sub_channel_code varchar(max),--子渠道
 			@del_location_code nvarchar(max),--出货工厂
-			@outlet_nos nvarchar(max)--客户编号
+			@outlet_nos nvarchar(max),--客户编号
+	        @ps_route nvarchar(max),--预销线路
+	        @payment_terms nvarchar(max)--付款条件
 	DECLARE CUR_ROUTE1 CURSOR KEYSET FOR 
 		select call_location_code,business_type_extens,trade_name,sub_channel_code,del_location_code,outlet_nos,string_value
 		from OE.SBIPlant.OE_ProductOrderLimit o with(nolock)
@@ -140,7 +163,7 @@ begin
 			and (ISNULL(@trade_name, '') = '' or s.ChainNo in (select col from OE.SBIPlant.F_Split(@trade_name, ',') where isnull(col, '') <> '')) --KA编号
 			and (ISNULL(@sub_channel_code, '') = '' or s.SubTradeChannelCd in (select col from OE.SBIPlant.F_Split(@sub_channel_code, ',') where isnull(col, '') <> '')) --子渠道
 			and (ISNULL(@del_location_code, '') = '' or	s.DeliveryLocCd in (select col from OE.SBIPlant.F_Split(@del_location_code, ',') where isnull(col, '') <> '')) --出货工厂
-			and (ISNULL(@outlet_nos,'') = '' or s.StoreId in 
+			and (ISNULL(@outlet_nos,'') = '' or s.StoreId in
 				(
 					select t1.col
 					from OE.SBIPlant.F_Split(@outlet_nos, ',') t1
@@ -168,10 +191,10 @@ begin
 	
 	--黑名单插入临时表#t_cantsell_product
 	DECLARE CUR_ROUTE2 CURSOR KEYSET FOR 
-		select call_location_code,business_type_extens,trade_name,sub_channel_code,del_location_code,string_value
+		select call_location_code,business_type_extens,trade_name,sub_channel_code,del_location_code,string_value,payment_terms,ps_route
 		from OE.SBIPlant.OE_ProductOrderLimit o with(nolock)
 		where o.function_code = 102--黑名单
-	open CUR_ROUTE2 FETCH NEXT FROM CUR_ROUTE2 INTO @call_location_code,@business_type_extens,@trade_name,@sub_channel_code,@del_location_code,@products
+	open CUR_ROUTE2 FETCH NEXT FROM CUR_ROUTE2 INTO @call_location_code,@business_type_extens,@trade_name,@sub_channel_code,@del_location_code,@products,@payment_terms,@ps_route
 	while @@FETCH_STATUS = 0
 	BEGIN
 		insert into #t_cantsell_product(StoreId, ProductId)
@@ -185,7 +208,9 @@ begin
 			and (ISNULL(@trade_name, '') = '' or s.ChainNo in (select col from OE.SBIPlant.F_Split(@trade_name, ',') where isnull(col, '') <> '')) -- KA编号
 			and (ISNULL(@sub_channel_code, '') = '' or s.SubTradeChannelCd in (select col from OE.SBIPlant.F_Split(@sub_channel_code, ',') where isnull(col, '') <> '')) -- 子渠道
 			and (ISNULL(@del_location_code, '') = '' or s.DeliveryLocCd in (select col from OE.SBIPlant.F_Split(@del_location_code, ',') where isnull(col, '') <> '')) --出货工厂
-			and not exists
+			and (ISNULL(@payment_terms, '') = '' or s.PaymentTerms in (select col from OE.SBIPlant.F_Split(@payment_terms, ',') where isnull(col, '') <> '')) --付款条件
+			and (ISNULL(@ps_route, '') = '' or s.PsRoute in (select col from OE.SBIPlant.F_Split(@ps_route, ',') where isnull(col, '') <> '')) --预销线路
+		    and not exists
 			(
 				select 1 from #t_cantsell_product tpp
 				where tpp.StoreId = s.StoreId and tpp.ProductId = p.col
@@ -195,7 +220,7 @@ begin
 				select 1 from #t_all_product allp
 				where p.col = allp.ProductId
 			)
-	FETCH NEXT FROM CUR_ROUTE2 INTO @call_location_code,@business_type_extens,@trade_name,@sub_channel_code,@del_location_code,@products
+	FETCH NEXT FROM CUR_ROUTE2 INTO @call_location_code,@business_type_extens,@trade_name,@sub_channel_code,@del_location_code,@products,@payment_terms,@ps_route
 	end
 	CLOSE CUR_ROUTE2
 	DEALLOCATE CUR_ROUTE2
@@ -247,11 +272,13 @@ begin
 			@TownCode nvarchar(10),--乡镇代码
 			@DelLocationCode nvarchar(20),--出货工厂
 			@ActDeliveryLocCd nvarchar(20),--实际发货工厂
-			@lowerLimitValue int--下限值
+			@lowerLimitValue int,--下限值
+	        @SalesLocCd nvarchar(36),--营业所
+	        @PsRoute nvarchar(4)--预销线路
 	DECLARE CUR_ROUTE4 CURSOR KEYSET FOR 
-		select StoreId, ChainNo, SubTradeChannelCd, ExtBusinessTypeCd, TownCode, DeliveryLocCd, ActDeliveryLocCd
+		select StoreId, ChainNo, SubTradeChannelCd, ExtBusinessTypeCd, TownCode, DeliveryLocCd, ActDeliveryLocCd,PsRoute,SalesLocCd
 		from #tblStore s with(nolock)
-	open CUR_ROUTE4 FETCH NEXT FROM CUR_ROUTE4 INTO @StoreId,@ChainNo,@SubTradeChannelCd,@ExtBusinessTypeCd,@TownCode,@DelLocationCode,@ActDeliveryLocCd
+	open CUR_ROUTE4 FETCH NEXT FROM CUR_ROUTE4 INTO @StoreId,@ChainNo,@SubTradeChannelCd,@ExtBusinessTypeCd,@TownCode,@DelLocationCode,@ActDeliveryLocCd,@PsRoute,@SalesLocCd
 	while @@FETCH_STATUS = 0
 	BEGIN
 		
@@ -265,13 +292,15 @@ begin
 			and (business_type_extens = '' or business_type_extens = @ExtBusinessTypeCd)
 			and (town_code = '' or town_code = @TownCode)
 			and (del_location_code = '' or del_location_code = @ActDeliveryLocCd) --下限,如果客户有实际发货工厂则取实际发货工厂,否则取出货工厂
+		    and (isnull(call_location_code,'')='' or call_location_code = @SalesLocCd)
+		    and (isnull(ps_route,'')='' or ps_route = @PsRoute)
 		order by item_no asc
 				
 		update #tblStore
 		set LowerLimit = @lowerLimitValue
 		where StoreId = @StoreId
 	
-	FETCH NEXT FROM CUR_ROUTE4 INTO @StoreId,@ChainNo,@SubTradeChannelCd,@ExtBusinessTypeCd,@TownCode,@DelLocationCode, @ActDeliveryLocCd
+	FETCH NEXT FROM CUR_ROUTE4 INTO @StoreId,@ChainNo,@SubTradeChannelCd,@ExtBusinessTypeCd,@TownCode,@DelLocationCode, @ActDeliveryLocCd,@PsRoute,@SalesLocCd
 	end
 	CLOSE CUR_ROUTE4
 	DEALLOCATE CUR_ROUTE4

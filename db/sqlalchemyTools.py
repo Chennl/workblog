@@ -1,8 +1,8 @@
-
+#https://www.osgeo.cn/sqlalchemy/orm/tutorial.html#version-check
 from sqlalchemy import create_engine,distinct,func,literal
 from sqlalchemy import text,and_,or_
 from sqlalchemy import event
-from sqlalchemy.engine import Engine
+#from sqlalchemy.engine import Engine
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker,aliased
 from sqlalchemy.sql import exists
@@ -12,38 +12,44 @@ import random
 import logging
 import time
 
+
+
+from db.models import Employee,Department,Address #,Category,Goods,Node,
+from models import Base
 logger = logging.getLogger(__name__)
 logging.basicConfig()
 logger.setLevel(logging.DEBUG)
 
-Base = declarative_base()
+#Base = declarative_base()
 engine = None
 session = None
 
-@event.listens_for(Engine, "before_cursor_execute")
-def before_cursor_execute(conn, cursor, statement,
-                        parameters, context, executemany):
-    conn.info.setdefault('query_start_time', []).append(time.time())
-    logger.debug("Start Query: %s", statement)
+# @event.listens_for(Engine, "before_cursor_execute")
+# def before_cursor_execute(conn, cursor, statement,
+#                         parameters, context, executemany):
+#     conn.info.setdefault('query_start_time', []).append(time.time())
+#     logger.debug("Start Query: %s", statement)
 
-@event.listens_for(Engine, "after_cursor_execute")
-def after_cursor_execute(conn, cursor, statement,
-                        parameters, context, executemany):
-    total = time.time() - conn.info['query_start_time'].pop(-1)
-    logger.debug("Query Complete!")
-    logger.debug("Total Time: %f", total)
+# @event.listens_for(Engine, "after_cursor_execute")
+# def after_cursor_execute(conn, cursor, statement,
+#                         parameters, context, executemany):
+#     total = time.time() - conn.info['query_start_time'].pop(-1)
+#     logger.debug("Query Complete!")
+#     logger.debug("Total Time: %f", total)
 
+def get_dburl():
+    dburl = environ.get('SQLALCHEMY_DATABASE_URI','mysql+pymysql://root:root@localhost:3306/my753721?charset=utf8')
+    # dburl='mysql+pymysql://root:root@localhost:3306/my753721?charset=utf8'
+    return dburl
 #setup_once
-def setup_database(dburl, echo=True,dropall=False):
+def setup_database(dburl, echo=True,drop_all=False):
     global engine
     engine = create_engine(dburl, echo=echo)
-    if dropall:
+    if drop_all:
         Base.metadata.drop_all(engine)
     Base.metadata.create_all(engine)
 
-db_connect_string='mysql+pymysql://root:root@localhost:3306/my753721?charset=utf8'
-dburl = environ.get('SQLALCHEMY_DATABASE_URI',db_connect_string)
-# 
+
 
 
 
@@ -54,7 +60,8 @@ def make_session():
     Session.configure(bind=engine)
     session = Session()
 
-from db.models import Employee,Department,Category,Goods,Node
+#https://faker.readthedocs.io/en/stable/index.html
+# pip install Faker
 
 def init_employee_data():
     
@@ -65,7 +72,11 @@ def init_employee_data():
     
     # session.execute(Employee.__table__.delete())
     # session.execute(Department.__table__.delete())
-      
+    
+    import faker
+    fake=faker.Faker() #Faker('zh_CN')
+    #Faker.seed(0)
+
     session.query(Employee).delete()
     session.query(Department).delete()
 
@@ -74,7 +85,8 @@ def init_employee_data():
         params =[
                 {
                     "id":i,
-                    "name":"Department Name %d"%i,
+                    "name": fake.company(),
+                    "create_date":fake.date_time()
                 } for i in range(101,151)
             ],
     )
@@ -87,12 +99,27 @@ def init_employee_data():
             params =[
                     {
                         "id":i,
-                        "name":"employee Name %d"%i,
+                        "name":fake.name(),
+                        "hired_on":fake.date(),
                         "department_id":random.randint(101,150)
                     } for i in range(chunk,chunk+10000)
                 ],
         )
         session.commit()
+
+    session.execute(
+        Address.__table__.insert(),
+        params =[
+                {
+                    "id":i,
+                    "name":fake.name(),
+                    "email_address": fake.email(),
+                    "employee_id":random.randint(10000,59999)
+                } for i in range(10000,50000)
+            ],
+    )
+    session.commit()
+
 
 def test_orm_full_objects_chunks(n):
     """Load fully tracked ORM objects a chunk at a time using yield_per()."""
@@ -265,9 +292,9 @@ def page_query(category_id=None,page=None, page_size=None):
 # print(type(a),a)
 
 
-setup_database(dburl=dburl)
+setup_database(dburl=get_dburl(),drop_all=True)
 make_session()
-#init_employee_data()
+init_employee_data()
 #test_orm_full_objects_chunks(40000)
 
 #page_query(page=3,page_size=5)
@@ -330,7 +357,36 @@ def query_demo():
     result = session.query(Department).filter(~stmt).all()
     print(result)
 #统计每部门人数
-stmt = session.query(Employee.department_id,func.count('*').label('employees_count')).group_by(Employee.department_id).subquery()
-result = session.query(Department.id,stmt.c.employees_count).outerjoin(stmt,Department.id==stmt.c.department_id).order_by(Department.id).all()
-print(result)
+#stmt = session.query(Employee.department_id,func.count('*').label('employees_count')).group_by(Employee.department_id).subquery()
+#result = session.query(Department.id,stmt.c.employees_count).outerjoin(stmt,Department.id==stmt.c.department_id).order_by(Department.id).all()
+#print(result)
+
+
+# stmt=text('select id,name from demo_employee where name=:name')
+# stmt.columns(Employee.id,Employee.name)
+# result = session.query(Employee).from_statement(stmt).params(name='employee Name 10001').first()
+
+# print(result)
+# result = session.query(func.count('*')).select_from(Employee).scalar()
+# result = session.query(func.count(Employee.id)).scalar()
+# print(result)
+
+#session.query(Address).all()
 #assert('')
+
+# from sqlalchemy import MetaData
+# table_names=['demo_employee','demo_department',]
+# engine = create_engine(dburl, echo=True)
+# #Base = declarative_base()
+# metadata = MetaData(engine, reflect=True)
+# for table_name in table_names:
+#     table = metadata.tables.get(table_name)
+#     if table is not None:
+#         logging.info(f'Deleting {table_name} table')
+#         Base.metadata.drop_all(engine, [table], checkfirst=True)
+
+# #Base.metadata.drop_all(engine)
+# Base.metadata.create_all(engine)
+
+
+ 
