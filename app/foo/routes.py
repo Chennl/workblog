@@ -22,6 +22,10 @@ def validate_image(stream):
         return None
     return '.' + (format if format != 'jpeg' else 'jpg')
 
+@bp.route('/hello', methods=['GET','POST'])
+def say_song():
+    return 'hello'
+
 @bp.route('/song/download', methods=['GET','POST'])
 def download_song():
 

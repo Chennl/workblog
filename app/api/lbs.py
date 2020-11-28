@@ -33,7 +33,7 @@ def get_client_location_by_ip(clientip):
     except Exception as e:
         print(e)
     return location 
-@bp.route('/get_ip',methods=['GET'])
+@bp.route('/lbs/get_ip',methods=['GET'])
 def get_ip():
     return jsonify({'ip':get_client_ip()})
 

@@ -1,0 +1,33 @@
+.hot-container{
+  color: black;
+}
+.hot-header {
+    background-color:lightgray;
+    min-height: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between ;
+    font-size: calc(10px + 2vmin);
+    padding: 5px;
+  }
+.hot-header a{
+    margin-right: 10px;
+    text-decoration: none;
+    color: blue
+}
+.hot-body{
+  display: flex;
+  justify-content: flex-start;
+  min-height: 100px;
+}
+.hotlist {
+  list-style: none;
+  list-style-position: outside;
+  text-decoration: none;
+  display: inline-block;
+  margin: 5px;
+  background-color: palegreen;
+  padding: 5px;
+  border:1 ;
+
+}

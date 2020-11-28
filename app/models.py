@@ -11,7 +11,7 @@ from itsdangerous import TimedJSONWebSignatureSerializer as Serializer
 from sqlalchemy import text,and_
 import jwt
 
-
+ 
 from app import db,login_manager
 
 followers = db.Table(
@@ -48,10 +48,10 @@ class User(UserMixin,db.Model):
     avatar_file = db.Column(db.String(100),default="default.jpg")
     last_seen = db.Column(db.DateTime, default=datetime.now)
     posts = db.relationship('Post', backref='author', lazy='dynamic')
-    token = db.Column(db.String(32), index=True, unique=True)
+    token = db.Column(db.String(256))
     token_expiration = db.Column(db.DateTime)
     
-    
+
     messages_sent = db.relationship('Message',
                                     foreign_keys='Message.sender_id',
                                     backref='author', lazy='dynamic')
@@ -71,6 +71,35 @@ class User(UserMixin,db.Model):
                 
     def __repr__(self):
         return '<User {}>'.format(self.username)
+    
+    def to_dict(self, include_email=False,include_link=False):
+        data = {
+            'id': self.id,
+            'username': self.username,
+            'last_seen': self.last_seen.isoformat() + 'Z',
+            'about_me': self.about_me,
+            'post_count': self.posts.count(),
+            'follower_count': self.followers.count(),
+            'followed_count': self.followed.count()
+        }
+        if include_email:
+            data['email'] = self.email
+        if include_link:
+            data['_links'] =  {
+                'self': url_for('api.get_user', id=self.id),
+                'followers': url_for('api.get_followers', id=self.id),
+                'followed': url_for('api.get_followed', id=self.id),
+                'avatar': self.avatar(128)
+            }
+        return data
+
+    def from_dict(self, data, new_user=False):
+        for field in ['username', 'email', 'about_me','nickname']:
+            if field in data:
+                setattr(self, field, data[field])
+        if new_user and 'password' in data:
+            self.set_password(data['password'])
+
     def set_password(self, password):
         self.password_hash = generate_password_hash(password)
         self.password_plain=password
@@ -111,8 +140,8 @@ class User(UserMixin,db.Model):
         now = datetime.now()
         if self.token and self.token_expiration > now + timedelta(seconds=60):
             return self.token
-        #self.token = base64.b64encode(os.urandom(24)).decode('utf-8')
-        self.token = self.generate_token(expires_in)
+        self.token = base64.b64encode(os.urandom(24)).decode('utf-8')
+        #self.token = self.generate_token(expires_in)
         self.token_expiration = now + timedelta(seconds=expires_in)
         db.session.commit()
         return self.token
@@ -123,7 +152,6 @@ class User(UserMixin,db.Model):
         
     @staticmethod
     def check_token(token):
-        print(token)
         user = User.query.filter_by(token=token).first()
         if user is None or user.token_expiration < datetime.now():
             return None
@@ -311,10 +339,106 @@ class MallGoods(db.Model):
         pass
 
 
+
+
+
+from sqlalchemy.ext.hybrid import hybrid_property
+from sqlalchemy import select, func
+import uuid
+
+# Base model that for other models to inherit from
+class Base(db.Model):
+    __abstract__ = True
+
+    id = db.Column(db.Integer, primary_key=True, autoincrement=True)
+    date_created = db.Column(db.DateTime, default=db.func.current_timestamp())
+    date_modified = db.Column(db.DateTime, default=db.func.current_timestamp(),
+                              onupdate=db.func.current_timestamp())
+ 
+ 
+
+# Model for poll topics
+class Topics(Base):
+    __tablename__ = 'poll_topics'
+    title = db.Column(db.String(500))
+    status = db.Column(db.Boolean, default=True)  # to mark poll as open or closed
+    create_uid = db.Column(db.ForeignKey('user.id'))
+    close_date = db.Column(db.DateTime)
+    created_by = db.relationship('User', foreign_keys=[create_uid],
+                                 backref=db.backref('user_topics',lazy='dynamic'))
+   
+
+    # user friendly way to display the object
+    def __repr__(self):
+        return self.title
+
+    # returns dictionary that can easily be jsonified
+    def to_json(self):
+        return {
+                'title': self.title,
+                'options': [{'name': option.option.name,
+                            'vote_count': option.vote_count,
+                            'uuid':option.uuid}
+                            for option in self.options.all()],
+                'close_date': self.close_date,
+                'status': self.status,
+                'total_vote_count': self.total_vote_count
+            }
+
+    @hybrid_property
+    def total_vote_count(self, total=0):
+        for option in self.options.all():
+            total += option.vote_count
+        return total
+
+    @total_vote_count.expression
+    def total_vote_count(cls):
+        return select([func.sum(Polls.vote_count)]).where(Polls.topic_id == cls.id)
+
+
+
+# Model for poll options
+class Options(Base):
+    __tablename__ = 'poll_options'
+    name = db.Column(db.String(128), unique=True)
+    def __repr__(self):
+        return self.name
+
+    def to_json(self):
+        return {
+                'id': uuid.uuid4(),  # Generates a random uuid
+                'name': self.name
+        }
+
+# Polls model to connect topics and options together
+class Polls(Base):
+    def gen_uuid():
+        return uuid.uuid4().hex
+    __tablename__ = 'poll_polls'
+    topic_id = db.Column(db.Integer, db.ForeignKey('poll_topics.id'))
+    option_id = db.Column(db.Integer, db.ForeignKey('poll_options.id'))
+    vote_count = db.Column(db.Integer, default=0)
+    uuid = db.Column(db.String(32),default=gen_uuid,index=True, unique=True)
+
+    topic = db.relationship('Topics', foreign_keys=[topic_id],backref=db.backref('options', lazy='dynamic'))
+    option = db.relationship('Options', foreign_keys=[option_id],backref=db.backref('options', lazy='dynamic'))
+
+    def __repr__(self):
+        return self.option.name
+
+
+class UserPolls(Base):
+    __tablename__ = 'poll_userpolls'
+    topic_id = db.Column(db.Integer, db.ForeignKey('poll_topics.id'))
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
+    option_id = db.Column(db.Integer,default=0)
+    topics = db.relationship('Topics', foreign_keys=[topic_id],
+                             backref=db.backref('voted_on_by', lazy='dynamic'))
+
+    users = db.relationship('User', foreign_keys=[user_id],
+                            backref=db.backref('voted_on', lazy='dynamic'))
+
+
 @login_manager.user_loader
 def load_user(id):
     return User.query.get(int(id))
-
-
-
-

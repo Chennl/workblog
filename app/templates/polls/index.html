@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <meta name="description" content="">
+    <meta name="author" content="">
+    <link rel="icon" href="http://getbootstrap.com/favicon.ico">
+
+    <title>Votr!</title>
+
+    <!-- Bootstrap core CSS -->
+    <link href="{{ url_for('static', filename='bootstrap-4.5.0/css/bootstrap.min.css') }}" rel="stylesheet">
+
+    <link href="https://fonts.googleapis.com/css?family=Cabin" rel="stylesheet">
+
+
+    <!-- React JS -->
+      <!-- Load React. -->
+  <!-- Note: when deploying, replace "development.js" with "production.min.js". -->
+  <script src="{{ url_for('static',filename='js/react@16.7.0/react.development.js')}}" ></script>
+  <script src="{{ url_for('static',filename='js/react@16.7.0/react-dom.development.js')}}" ></script>
+  <script src="{{ url_for('static',filename='js/react@16.7.0/babel.min.js')}}" ></script>
+  <script src="{{ url_for('static',filename='js/reactrouter@5.0.0/react-router.min.js')}}" ></script>
+  <script src="{{ url_for('static',filename='js/reactrouter@5.0.0/react-router-dom.min.js')}}" ></script>
+ 
+ <script src="{{ url_for('static',filename='js/material-ui.development.js')}}" ></script>
+  <!--
+  <script src="https://unpkg.com/browse/jquery@3.5.1/dist/jquery.min.js" crossorigin></script>
+  <script src="https://unpkg.com/react@16.7.0/umd/react.production.min.js" crossorigin></script>
+  <script src="https://unpkg.com/react-dom@17.0.1/umd/react-dom.production.min.js" crossorigin></script>
+  <script src="https://unpkg.com/babel-standalone@6/babel.min.js"></script>
+  <script src="https://unpkg.com/react-router@5.2.0/umd/react-router.min.js"></script>
+  <script src="https://unpkg.com/classnames/index.js"></script>
+  <script src="https://unpkg.com/@material-ui/core@latest/umd/material-ui.development.js" crossorigin="anonymous"></script>
+  -->
+
+  <!-- Fonts to support Material Design -->
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,400,500,700&display=swap" />
+  <!-- Icons to support Material Design -->
+  <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons" />
+
+  <script src="{{ url_for('static',filename='jquery-3.5.1/jquery.min.js')}}"></script>
+ 
+     
+
+    <script type="text/babel" src="{{ url_for('static', filename='js/polls.js') }}"></script>
+    {# <script src="{{ url_for('static',filename='js/react-datepicker@3.3.0/react-datepicker.min.js')}}" ></script>
+    <link href="{{ url_for('static', filename='js/react-datepicker@3.3.0/react-datepicker.css') }}" rel="stylesheet">   #}
+  
+      <!-- Custom styles for this template -->
+    <link href="{{ url_for('static', filename='css/polls/jumbotron-narrow.css') }}" rel="stylesheet">
+
+    {# <script src="{{ url_for('static', filename='js/ie-emulation-modes-warning.js') }}"></script> #}
+
+  </head>
+
+  <body> 
+      <nav class="navbar-fixed-top">
+          <div class="navbar justify-content-start flex-nowrap">
+              <ul class="nav nav-pills w-100">
+                {% if session.get('user') %}
+                  <li class="nav-pill"><a class="nav-link" href="#" data-toggle="pill">Hi {{ session['user']}}!</a></li>
+                  <li class="nav-pill"><a class="nav-link" href="{{ url_for('polls.logout') }}" data-toggle="pill">Logout</a></li>
+                {% endif %}
+                <li class="nav-pill ml-auto"><a class="nav-link" href="/polls" data-toggle="pill">Polls</a></li>
+              </ul>
+              <a style="padding-left: 30px;" href="/"><img height=28 src="{{ url_for('static', filename='img/polls/logo.png') }}" /></a>
+          </div>
+      </nav>
+      <div class="jumbotron">
+        <h1>It's easier with Votr!</h1>
+        <p class="lead">Create free online polls today with Votr</p>
+        {% if not session.get('user') %}
+        <p><a class="btn btn-lg btn-success" href="{{ url_for('polls.signup') }}" role="button">Sign up today</a></p>
+        {% else %}
+        <p><a class="btn btn-lg btn-success" href="/polls" role="button">Create a poll</a></p>
+        {% endif %}
+      </div>
+      <div class="container">
+        
+          {% if not session.get('user') %}
+            <div class="row">
+
+              <div class="col-lg-6">
+                <h3>It's so easy</h3>
+                <p>It's so easy to use Votr, just create an account and you can start
+                creating polls for the world to see!</p>
+              </div>
+
+              <div class="col-lg-6">
+                <h3 class="form-header">Login</h3>
+                <form method="post" action="{{ url_for('polls.login', next=request.args.get('next')) }}">
+                {% with messages = get_flashed_messages(with_categories=true) %}
+                    {% if messages %}
+                        {% for category, message in messages %}
+                        <p class="{{ category }}">{{ message }}</p>
+                        {% endfor %}
+                    {% endif %}
+                {% endwith %}
+                  <div class="form-group has-success">
+                    <input type="text" class="form-control" name="username" placeholder="Username" />
+                  </div>
+
+                  <div class="form-group has-success">
+                    <input type="password" class="form-control" name="password" placeholder="Password" />
+                  </div>
+
+                  <button type="submit" name="submit" class="btn btn-success">Submit</button>
+                </form>
+              </div>
+            </div>
+          {% else %}
+            <div id="container" class="row">
+
+            </div>
+          {% endif %}
+      </div>
+
+      <footer class="footer">
+        <p>&copy; 2016 Votr</p>
+      </footer>
+ 
+  </body>
+</html>

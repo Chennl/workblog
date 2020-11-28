@@ -29,6 +29,9 @@ def create_app(config_class=Config):
     mail.init_app(app)
     moment.init_app(app)
 
+    from app.errors import bp as err_bp
+    app.register_blueprint(err_bp)
+
     from app.api import bp as api_bp
     app.register_blueprint(api_bp,url_prefix='/api')
 
@@ -44,6 +47,11 @@ def create_app(config_class=Config):
     from app.main import bp as main_bp
     app.register_blueprint(main_bp)
 
+
+    from app.polls import bp as polls_bp
+    app.register_blueprint(polls_bp, url_prefix='/polls')
+
+     
     #微信公众号接入蓝图
     from app.wx import bp as wx_bp
     app.register_blueprint(wx_bp,url_prefix='/wx')

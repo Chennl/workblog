@@ -1,5 +1,5 @@
 {
-    "python.pythonPath": "c:\\workspace\\pythonWorkspace\\ewms\\venv\\Scripts\\python.exe",
+    "python.pythonPath": "c:\\workspace\\pythonWorkspace\\cp38venv\\Scripts\\python.exe",
     "files.associations": {
         "*.html": "jinja-html"
       },

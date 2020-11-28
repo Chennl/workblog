@@ -30,10 +30,13 @@ def before_request():
 def get_mp_verify():
     return render_template('wx/MP_verify_BYFISTG63Qu18us1.txt')
 
-@bp.route('/', methods=['GET'])
-def jumpmain():
-    return render_template('nginx.html')
+# @bp.route('/', methods=['GET'])
+# def jumpmain():
+#     return render_template('nginx.html')
 
+
+
+@bp.route('/', methods=['GET'])
 @bp.route('/index', methods=['GET', 'POST'])
 @login_required
 def index():
