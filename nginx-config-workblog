@@ -1,0 +1,14 @@
+server {
+    listen 80;
+    server_name workblog.zjswdl.cn;
+    charset   utf-8;
+    location / {     
+                
+         # Soulution-1-start	
+         # proxy_pass http://127.0.0.1:8000;
+         # Solution-1-end
+	 #uwsgi_pass 127.0.0.1:3031;
+         uwsgi_pass unix:///home/chennl/py3_workspace/workblog/uwsgi.sock;
+	 include uwsgi_params;
+    }
+}
