@@ -1,0 +1,86 @@
+{% extends "base.html" %}
+{% block styles %}
+<style>
+ 
+a i{
+    font-size:11px !important
+}
+
+.ppq-audio-player {
+  line-height:40px !important;
+  position:relative;
+  overflow:hidden;
+  height:40px !important;
+  margin:0 auto;
+  background:#f4f4f4
+}
+.ppq-audio-player .play-pause-btn .play-pause-icon {
+    width:32px !important; height:32px !important; background-size：50% !important;
+}
+.ppq-audio-player .play-pause-btn{float:left;margin:5px 0 0 5px !important;}
+.ppq-audio-player .player-bar{
+    margin-top:18px !important;
+}
+ </style>
+{% endblock styles %}
+{% block app_content %}
+    <h1>163音乐下载</h1>
+    <hr>
+    <span class='text-muted small'>您来自{{clientip}}</span>
+    <div class="container ">
+        <form method="post">
+            {{ form.hidden_tag() }}
+           
+            <div class="form-group">
+                <label>歌曲编号</Label>
+                {{form.song_id(class="form-control",placeholder='请输入歌曲编号')}}
+               
+            </div>
+            <div class="form-group">
+                <label>歌曲名称</Label>
+                 {{form.song_name(class="form-control",placeholder='请输入歌曲名称')}}
+            </div>          
+            {{ form.submit(class="btn btn-primary btn-block") }}
+        </form>
+ 
+        {%if files%}
+        <table class="table">
+        <tr><th>歌曲名称</th><th>大小</th><th>播放</th></tr>
+        {%for file in files%}
+        <tr>
+        <td>{{file.name}}</td>
+        <td>{{file.size}}</td>
+        <td width=200>
+        <audio   id="mp3player" src="/static/media/song/{{file.name}}">你的浏览器不支持音乐播放</audio>
+        </td>
+        </tr>
+        {%endfor%}
+        <tr>
+        <td colspan=3>
+            
+            
+        </td>
+        </tr>
+        </table>
+        {%endif%}
+</audio>
+    </div>
+{% endblock app_content %}
+
+
+{% block scripts %}
+<script  src="{{url_for('static',filename='Minimalist-Audio-Player/audio.min.js')}}"></script>
+ <script>
+   // 头像预览
+    $(function () {
+        $('audio').initAudioPlayer();
+
+     // var audio = document.getElementById('mp3player')
+     // $('.play').click(function(){
+     //     audio.play();
+     // });
+
+    });
+ </script>
+{% endblock%}
+

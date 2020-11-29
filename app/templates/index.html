@@ -1,0 +1,172 @@
+{% extends "base.html" %}
+{% from "_formhelpers.html" import render_field %}
+
+{% block styles %}
+<style type="text/css">
+    .liked{
+        color:red!important
+    }
+    .no-liked{
+        color:#6c757d!important
+    }
+</style>
+
+{% endblock styles %}
+
+{% block app_content %}
+
+<div class="row justify-content-between">
+    <h4>你好, {{ current_user.nickname }}!</h4><span class='text-muted small'><i class="fa fa-location-arrow"></i>您来自:[{{clientip}}]</span>
+</div>
+<div class="container">
+    <div class="row">
+    {% if form %}
+        <form method="post" style="width:100%">
+            <div class="form-group">
+                <Label for="post">我要发微博</Label> 
+                {%for c in form.category.choices %}
+                    <div class="form-check form-check-inline">
+                        <input class="form-check-input" type="radio" name="category" id="category" value="{{c[0]}}">
+                        <label class="form-check-label" for="category">{{c[1]}}</label>
+                    </div>
+                {%endfor%}
+            </div>
+            <div class="form-group">
+                    {{form.hidden_tag() }}  
+                <textarea class="form-control" id="post" name="post" placeholder="写一些自己的心情或者自己遇到的一些事情..." required="" row="3"></textarea>
+            </div>
+            
+            <div class="form-group"><input  value='0' name="host" type="text" hidden id="host"></div>
+            
+
+            <div class="form-group d-flex justify-content-between">
+                    <div class="form-check form-check-inline">
+                        <input class="form-check-input" type="checkbox" name="located" id="located">
+                        <label class="form-check-label" for="located" id="locatedlabel">显示位置</label>
+                    </div>
+                <input class="btn btn-success btn-sm" id="submit" name="submit" type="submit" value="发表微博">
+            </div>
+        </form>
+    </div>
+</div>
+{% endif %}
+ <br>
+{% for post in pagination.items %}
+    {% include '_post.html' %}
+
+{% endfor %}
+{% if prev_url%}<a href="{{prev_url}}">上一页</a>{% endif%}
+{% if next_url%}<a href="{{next_url}}">下一页</a>{% endif%}
+
+<nav aria-label="...">
+  <ul class="pagination">
+    <li class="{{'page-item' if pagination.has_prev else 'page-item disabled'}}">
+      <a class="page-link" href="{{url_for('main.index',page=pagination.prev_num if pagination.has_prev else None)}}" tabindex="-1" aria-disabled="true">上一页</a>
+    </li>
+    {% for i in range(1,pagination.pages+1) %}
+        {% if i==pagination.page%}
+            <li class="page-item active" aria-current="page">
+        {%else%}
+            <li class="page-item">
+        {% endif%}
+        <a class="page-link" href="{{url_for('main.index',page=i)}}">{{i}} <span class="sr-only">(current)</span></a>
+        </li>
+        {%if i>10 %}
+         <li class="page-item">
+         <a class="page-link" href="{{url_for('main.index',page=i)}}">...</a>
+        </li>
+        {%endif%}
+    {% endfor %}
+     <li class="{{'page-item' if pagination.has_next else 'page-item disabled'}}">
+      <a class="page-link" href="{{url_for('main.index',page=pagination.next_num if pagination.has_next else None)}}">
+      下一页 </a>
+    </li>
+  </ul>
+</nav>
+
+{% endblock %}
+
+{% block scripts %}
+<script type="text/javascript" src="{{url_for('static',filename='axios/axios.js')}}"></script>
+<script>
+    $(function(){
+        html_moment_render_all();
+        $('.likes').each(
+            function(){
+                var postid=$(this).data('postid');
+                //点赞处理
+                $(this).click(function(){
+                    if($(this).hasClass('liked')) {
+                        $(this).removeClass('liked').addClass('text-muted').children('.fa-thumbs-up').removeClass('fa-thumbs-up').addClass('fa-thumbs-o-up');
+                        $(this).children('.count').text(parseInt($(this).children('.count').text()) - 1);
+                    }else{
+                        $(this).addClass('liked').removeClass('text-muted').children('.fa-thumbs-o-up').removeClass('fa-thumbs-o-up').addClass('fa-thumbs-up');
+                        $(this).children('.count').text(parseInt($(this).children('.count').text()) + 1);
+                    }
+
+                    axios.post('/api/likes/'+postid,{'postid':postid})
+                    .then(function(response){  
+                        console.log(response);
+                    })
+                    .catch(function(error){
+                        console.log(error);
+                    });
+                });
+            }
+        );
+        $('#located').change(function(){
+           // alert($(this).prop('checked'));
+            console.log($(this).prop('checked'));
+            console.log($(this).prop('checked')=="true");
+            
+            if($(this).prop('checked')){
+                 $("#locatedlabel").text("正在定位...");
+                axios.get("/api/get_location")
+                .then(function(res){
+                    $("#locatedlabel").text(res.data.location);
+                })
+                .catch(function(){
+                     $("#locatedlabel").text("定位失败");
+                });
+            }
+            else{
+                $("#locatedlabel").text("显示位置");
+            }
+        });
+
+        
+        axios.get('http://httpbin.org/ip')
+        .then(function(response){
+             var ip= response.data.origin;
+            
+
+            console.log(response.data);
+            console.log(response.status);
+            console.log(response.statusText);
+            console.log(response.headers);
+            console.log(response.config);
+        }).catch(function(error){
+            if (error.response) {
+                    console.log(error.response.data);
+                    console.log(error.response.status);
+                    console.log(error.response.headers);
+               
+            }
+        });
+
+ var url= 'http://ip.ws.126.net/ipquery?ip=0.176.200.148' 
+             axios.get(url)
+             .then(function(response){
+                 var data = response.data;
+                console.log(response.data);
+             })
+             .catch(function(error){
+                if (error.response) {
+                    console.log(error.response.data);
+                    console.log(error.response.status);
+                    console.log(error.response.headers);  
+                }
+             });
+    });
+</script>
+{% endblock scripts %}

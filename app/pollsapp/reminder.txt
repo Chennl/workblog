@@ -1,0 +1,27 @@
+# reactjs run at python Flask
+ 在package.json 添加 "homepage": "/static/backend/build"
+
+# react-router tutorail
+ https://www.sitepoint.com/react-router-complete-guide/
+ https://reactrouter.com/web/example/url-params
+# javascript 跳转: 
+https://stackoverflow.com/questions/31079081/programmatically-navigate-using-react-router
+
+# router location:
+ https://reactrouter.com/web/api/location
+
+# Antd Icon
+https://ant.design/components/icon-cn/
+# Antd tutorial
+https://www.yuque.com/ant-design/course/ghalng
+# Antd doc
+https://ant.design/components/message-cn/
+
+
+# powershell 
+       手动安装 wsl2 ubuntu-1804  
+	   https://docs.microsoft.com/en-us/windows/wsl/install-manual#downloading-distros-via-the-command-line
+ ## 下载:   
+Invoke-WebRequest -Uri  https://aka.ms/wsl-ubuntu-1604 -OutFile Ubuntu.appx -UseBasicParsing
+
+ 

@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width,initial-scale=1,user-scalable=0">
+        <title>WeUI</title>
+        <!-- 引入 WeUI CDN 链接 -->
+        <link rel="stylesheet" href="{{url_for('static',filename='weui/style/weui.css')}}"/>
+        <script src="http://res.wx.qq.com/open/js/jweixin-1.6.0.js"></script>
+        <script src="{{url_for('static',filename='jquery-3.5.1/jquery.min.js')}}"></script>
+    </head>
+    <body ontouchstart="">
+        <div class="page">
+            <div class="page__hd">
+                <h1 class="page__title">
+                    <img src="../static/img/logo.png" alt="WeUI" height="21px" />
+                </h1>
+                <p class="page__desc">WeUI 是一套同微信原生视觉体验一致的基础样式库。</p>
+            </div>
+             <div class="page__bd page__bd_spacing">
+                <div class="button_sp_area">
+                    <a href="javascript:alert(1);" class="weui_btn weui_btn_primary" id=''>Jump Code</a>
+                    <button onclick='getCode()'>getCode</button>
+                </div>
+                <p> H5授权
+                <h3 id="menu-image">图像接口</h3>
+                <span class="desc">拍照或从手机相册中选图接口</span>
+                
+                <a href="javascript:alert(1);" class="weui_btn weui_btn_primary" id='chooseImage'>chooseImage</a>
+                <span class="desc">预览图片接口</span>
+                <button class="weui-btn weui_btn_primary" id="previewImage">previewImage</button>
+                <span class="desc">上传图片接口</span>
+                <button class="weui-btn weui_btn_primary" id="uploadImage">uploadImage</button>
+                <span class="desc">下载图片接口</span>
+                <button class="weui-btn weui_btn_primary" id="downloadImage">downloadImage</button>
+                
+       
+
+                <a href="{{url_for('wx.next')}}">下一页</a>
+             </div>
+             <div><a href='https://open.weixin.qq.com/connect/oauth2/authorize?appid=wxfa9191e55c89875b&redirect_uri=http://mp.zjswdl.cn/wx/default.html?appid=wxfa9191e55c89875b&v=20190610&response_type=code&scope=snsapi_base&state=9dc800592#wechat_redirect'>测试公众号</a></div>
+             <div><a href='https://open.weixin.qq.com/connect/oauth2/authorize?appid=wxa6dcb6c466cf641f&redirect_uri=http://myscczjqnr.app.swiretest.com/wx/default.html?appid=wxa6dcb6c466cf641f&v=20190610&response_type=code&scope=snsapi_base&state=9dc800592#wechat_redirect'>太古可乐公众号</a></div>
+
+        </div>
+
+          <script>
+            window.APPID= 'wxfa9191e55c89875b'
+           
+        function getCode () { // 非静默授权，第一次有弹框
+
+        //ZJSW公众号
+          //window.location.href= 'https://open.weixin.qq.com/connect/oauth2/authorize?appid=g&redirect_uri=http://www.zjswdl.cn/wx/default.html?appid=wxfa9191e55c89875b&v=20190610&response_type=code&scope=snsapi_base&state=9dc800592#wechat_redirect'
+        window.location.href=  'https://open.weixin.qq.com/connect/oauth2/authorize?appid=wxa6dcb6c466cf641f&redirect_uri=http://www.zjswdl.cn/wx/default.html?appid=wxa6dcb6c466cf641f&v=20190610&response_type=code&scope=snsapi_base&state=9dc800592#wechat_redirect'
+        
+         return 
+        //太古可乐公众号
+         //window.location.href=  'https://open.weixin.qq.com/connect/oauth2/authorize?appid=wxa6dcb6c466cf641f&redirect_uri=http://myscczjqnr.app.swiretest.com/wx/default.html?appid=wxa6dcb6c466cf641f&v=20190610&response_type=code&scope=snsapi_base&state=9dc800592#wechat_redirect'
+         return 
+        //飞讯科技 
+         window.location.href ='https://open.weixin.qq.com/connect/oauth2/authorize?appid=wx849caac9dc800592&redirect_uri=https%3A%2F%2Fgmp.ficent.com%2Fwechat%2Fdefault.html%3Fappid%3Dwx849caac9dc800592%26v%3D20190610&response_type=code&scope=snsapi_base&state=#wechat_redirect';
+         return 
+            const code = ''//GetUrlParam('code') // 截取路径中的code，如果没有就去微信授权，如果已经获取到了就直接传code给后台获取openId
+            const local = window.location.href // encodeURIComponent(local)
+            if (code == null || code === '') {
+                window.location.href = 'https://open.weixin.qq.com/connect/oauth2/authorize?appid=wxfa9191e55c89875b&redirect_uri=http%3A%2F%2Fwww.zjswdl.cn%2Fwechat%2Fdefault.html&response_type=code&scope=snsapi_userinfo&state=1#wechat_redirect'
+                window.location.href = 'https://open.weixin.qq.com/connect/oauth2/authorize?appid=wx849caac9dc800592&redirect_uri=https%3A%2F%2Fgmp.ficent.com%2Fwechat%2Fdefault.html%3Fappid%3Dwx849caac9dc800592%26v%3D20190610&response_type=code&scope=snsapi_base&state=#wechat_redirect'
+            } else {
+                this.getOpenId(code) //把code传给后台获取用户信息
+            }
+        }
+
+            function test(){
+                window.location.href = "https://open.weixin.qq.com/connect/oauth2/authorize?appid=wxfa9191e55c89875b&redirect_uri=www.zjswdl.cn/wx/code&response_type=code&scope=snsapi_userinfo&state=STATE#wechat_redirect"
+            }
+            $(function () {
+                //alert(location.href.split('#')[0])
+                //var redirectUrl=encodeURIComponent(location.href.split('#')[0]); //对当前url编码
+                redirectUrl=location.href.split('#')[0]
+                console.log(redirectUrl)
+                return;
+                //alert(window.location.host)
+                $.ajax({
+                    type :'GET',
+                    url:'get_sign',
+                    data:{url:location.href.split('#')[0]},
+                    error: function(XMLHttpRequest, textStatus, errorThrown){  
+                        alert("获取签名失败! 发生错误："+errorThrown);  
+                    },
+                    success:function(data){
+                        console.log(JSON.stringify(data.jsapi_sign))
+                        var noncestr = data.jsapi_sign.nonceStr;  
+                        var timestamp = data.jsapi_sign.timestamp;  
+                        var signature = data.jsapi_sign.signature; 
+    
+                         wx.config({
+                            debug: true, // 开启调试模式,调用的所有api的返回值会在客户端alert出来，若要查看传入的参数，可以在pc端打开，参数信息会通过log打出，仅在pc端时才会打印。
+                            appId: 'wxfa9191e55c89875b', // 必填，公众号的唯一标识
+                            timestamp: timestamp, // 必填，生成签名的时间戳
+                            nonceStr: noncestr, // 必填，生成签名的随机串
+                            signature: signature,// 必填，签名
+                            jsApiList: ['onMenuShareTimeline','onMenuShareAppMessage','onMenuShareQQ',
+                                    'onMenuShareWeibo','onMenuShareQZone','chooseImage',
+                                    'uploadImage','downloadImage','startRecord','stopRecord',
+                                    'onVoiceRecordEnd','playVoice','pauseVoice','stopVoice',
+                                    'translateVoice','openLocation','getLocation','hideOptionMenu',
+                                    'showOptionMenu','closeWindow','hideMenuItems','showMenuItems',
+                                    'showAllNonBaseMenuItem','hideAllNonBaseMenuItem'] // 必填，需要使用的JS接口列表
+                        });
+
+                    } 
+                })
+                
+                 wx.error(function (res) {
+                    alert("接口验证失败，详细信息：\n"+JSON.stringify(res));
+                });
+                wx.ready(function () {
+
+                    // 5 图片接口
+                    // 5.1 拍照、本地选图
+                    var images = {
+                        localId: [],
+                        serverId: [],
+                        url: []
+                    };
+                    $("#btn").click(function(){alert(2)});
+                    document.querySelector('#chooseImage').onclick = function() {
+                        wx.chooseImage({
+                            success: function(res) {
+                                images.localId = res.localIds;
+                                alert('已选择 ' + res.localIds.length + ' 张图片');
+                                // 5.2 图片预览
+                                document.querySelector('#previewImage').onclick = function() {
+                                    wx.previewImage({
+                                        current: images.localId[0],
+                                        urls: images.localId
+                                    });
+                                };
+                            }
+                        });
+                    };
+
+                });
+
+
+
+
+            });
+            </script>
+  
+         
+
+         
+    </body>
+</html>

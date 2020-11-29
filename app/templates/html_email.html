@@ -1,0 +1,27 @@
+{%extends 'base.html'%}
+{% block app_content %}
+{% if form %}
+<br>
+<form method="post">
+        {{form.hidden_tag() }}  
+        <div class="input-group">
+            <div class="input-group-prepend">
+                <span class="input-group-text">收件人</span>
+            </div>
+            <input type="text" aria-label="First name" name='recipients' id='recipients' class="form-control" value="chennianlai@swirecocacola.com">
+        </div>  
+        <div class="input-group">
+            <div class="input-group-prepend">
+                <span class="input-group-text">主题</span>
+            </div>
+            <input type="text" aria-label="sender name" name='subject' id='subject' class="form-control" >
+        </div>      
+        <div>
+            <label for='text_body'>邮件内容</label>
+            <textarea class="form-control" id="text_body" name="text_body" placeholder="邮件正文..." required="" style="height:248px"></textarea>
+        </div>
+        <div class='form-group d-flex  justify-content-end mt-1'>
+        <input class="btn btn-warning" id="submit" name="submit" type="submit" value="发送"></div>
+    </form>
+{% endif %}
+{% endblock app_content %}

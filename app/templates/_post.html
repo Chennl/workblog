@@ -1,0 +1,92 @@
+
+<table class='table' >
+<tr>
+        <td>
+            {% set user_link %}
+                <span class="user_popup">
+                    <a href="{{url_for('main.user', username=post.author.username)}}">
+                        {{ post.author.username }}
+                    </a>
+                </span>
+            {% endset %}
+            <div class="container">
+            <div class="row">
+                <div class="d-flex" style="flex-shrink:0,width:70px">
+                    <a href="{{ url_for('main.user', username=post.author.username) }}">
+                        <img src="{{ post.author.avatar(70) }}" class="rounded-circle"   width="50px" height="50px" />
+                    </a>
+                </div>
+                <div class="col">
+                    <div class="row d-flex justify-content-between">
+
+                           <div class="container d">          
+                                <div class='row'>{{user_link}}</div>
+                                <div class="row d-flex justify-content-between">
+                                    <div class="text-muted" style="font-size:11px"><i class="fa fa-clock-o"></i>
+                                        <span class="html-moment" data-format="YYYY-MM-DD HH:mm:ss" data-timestamp="{{post.timestamp}}" > </span>
+                                    </div> 
+
+                                    <div class="d-flex justify-content-end  text-muted">
+                                        <a href="#" class="d-inline-block text-muted" style="font-size:10px;width: 50px;"><i class="fa fa-eye"></i> 9点击</a>
+                                        <span class="d-inline-block text-muted" style="font-size:10px;width: 50px;"><i class="fa fa-commenting-o"></i> 8评论</span>
+                                        {%if post.is_liking(current_user) %}
+                                        <a href="#" class="d-inline-block text-decoration-none likes  liked " style="font-size:10px;" data-postid={{post.id}}>   
+                                            <i class="fa fa-thumbs-up "></i>                         
+                                            <span class='count'> {{post.likes_count()}}<span>
+                                        </a>  
+                                        {%else%}
+                                            <a href="#" class="d-inline-block text-decoration-none likes text-muted " style="font-size:10px;" data-postid={{post.id}}>   
+                                            <i class="fa fa-thumbs-o-up "></i>                         
+                                            <span class='count'> {{post.likes_count()}}<span>
+                                            </a> 
+                                        {%endif%}    
+                                    </div>
+
+                                </div>     
+
+                            </div>
+
+                    </div>
+                    
+                    <div class="row align-items-center">
+                       <span class="text-muted" style="font-size:10px">【{{post.category}}】</span> <span id="post{{ post.id }}">{{ post.body }}</span>
+                    </div>
+
+                     <!-- comments-->
+                    <div class="container mt-2">
+                    {%for comment in post.get_comments():%}
+                        {% include '_comment.html' %}
+                    {%endfor%}
+                    </div>
+                    {%if form%}
+                        
+                            <form method="post">
+                                {{form.hidden_tag() }}
+                                <div class="form-group">
+                                    <textarea class="form-control" id="post" name="post" row="3" placeholder='说点什么吧'></textarea>
+                                </div>
+                                <div class="form-group">
+                                    <input type="hidden" value='{{post.id}}' name="host" id="host">
+                                </div>
+                                <div class="form-group d-flex justify-content-end">
+                                    <input id="submit" name="submit" type="submit" class="btn btn-info btn-sm" value="发表评论">
+                                </div>
+                            </form>
+                        
+                    {%endif%}
+
+                     <!-- endcomments-->
+                    <br>
+                   
+                   
+                </div>
+            </div>
+            
+            </div>
+
+          
+
+        </td>
+        
+</tr>
+</table>

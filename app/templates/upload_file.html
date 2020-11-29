@@ -1,0 +1,25 @@
+{% extends "base.html" %}
+{% block styles %}
+ <link rel="stylesheet" href="{{url_for('static',filename='font-awesome-4.7.0/css/font-awesome.css')}}" />
+{% endblock styles %}
+{% block app_content %}
+ 
+    <h1>File Upload</h1>
+    <form method="POST" action="" enctype="multipart/form-data">
+      <p><input type="file" name="file"></p>
+      <p><input type="submit" value="Submit"></p>
+    </form>
+ 
+{% endblock  %}
+{% block scripts%}
+  
+ <script  src="{{url_for('static',filename='datetimepicker/js/tempusdominus-bootstrap-4.js')}}"></script>
+
+ <script>
+    $(function(){
+        
+
+    
+    })
+</script>
+{% endblock%}

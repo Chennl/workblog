@@ -1,0 +1,11 @@
+.search_box{
+    display: flex;
+    min-height: 20px;
+    padding: 10px;
+}
+.search_box input,.search_box button{
+    margin-left: 10px;
+    font-size: medium;
+    margin: 1px;
+    min-height: 30px;
+}

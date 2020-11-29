@@ -1,0 +1,3 @@
+FLASK_APP=workblog.py
+FLASK_ENV=development
+FLASK_DEBUG=1
